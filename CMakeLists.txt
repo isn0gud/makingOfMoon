@@ -1,10 +1,10 @@
 cmake_minimum_required(VERSION 3.5)
-if(APPLE)
+if (APPLE)
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -framework Cocoa -framework OpenGL -framework IOKit -framework CoreVideo -framework GLUT") # compiler version and compiler flags.
-endif()
-if(UNIX AND NOT APPLE)
-     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
-endif()
+endif ()
+if (UNIX AND NOT APPLE)
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
+endif ()
 
 
 project(makingOfMoon)
@@ -53,8 +53,17 @@ target_include_directories(${PROJECT_NAME} PRIVATE "${GLM_DIR}/include")
 
 
 # glfw
-set(GLFW_BUILD_DOCS OFF CACHE BOOL "" FORCE)
-set(GLFW_BUILD_TESTS OFF CACHE BOOL "" FORCE)
-set(GLFW_BUILD_EXAMPLES OFF CACHE BOOL "" FORCE)
-find_package(glfw3 3.2 REQUIRED)
-target_link_libraries(${PROJECT_NAME} ${CMAKE_DL_LIBS} glfw)
+if (UNIX AND NOT APPLE)
+
+    set(GLFW_BUILD_DOCS OFF CACHE BOOL "" FORCE)
+    set(GLFW_BUILD_TESTS OFF CACHE BOOL "" FORCE)
+    set(GLFW_BUILD_EXAMPLES OFF CACHE BOOL "" FORCE)
+    find_package(glfw3 3.2 REQUIRED)
+    target_link_libraries(${PROJECT_NAME} ${CMAKE_DL_LIBS} glfw)
+endif ()
+if (APPLE)
+    set(GLFW_DIR "${LIB_DIR}/glfw3")
+    add_subdirectory("${GLFW_DIR}")
+    target_link_libraries(${PROJECT_NAME} "glfw" "${GLFW_LIBRARIES}")
+    target_include_directories(${PROJECT_NAME} PRIVATE "${GLFW_DIR}/include")
+endif ()

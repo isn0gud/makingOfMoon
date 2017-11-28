@@ -19,6 +19,7 @@ private:
 
 public:
     RndAccelFieldSim();
+
     std::vector<Particle *> getParticles() override;
 
     void updateStep(int numTimeSteps, float stepSize) override;

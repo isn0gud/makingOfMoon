@@ -57,7 +57,7 @@ void RndAccelFieldSim::updateStep(int numTimeSteps, float dt) {
         }
 
         p->accel = total_grav;
-        p->velo = p->velo + (p->accel * (GLfloat)  numTimeSteps * SIM_SPEED);
+        p->velo = p->velo + (p->accel * (GLfloat) numTimeSteps * SIM_SPEED);
         p->pos = p->pos + (p->velo * (GLfloat) numTimeSteps * SIM_SPEED);
 
     }
