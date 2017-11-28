@@ -1,6 +1,10 @@
-cmake_minimum_required(VERSION 3.8)
-
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -framework Cocoa -framework OpenGL -framework IOKit -framework CoreVideo -framework GLUT") # compiler version and compiler flags.
+cmake_minimum_required(VERSION 3.5)
+if(APPLE)
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -framework Cocoa -framework OpenGL -framework IOKit -framework CoreVideo -framework GLUT") # compiler version and compiler flags.
+endif()
+if(UNIX AND NOT APPLE)
+     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
+endif()
 
 
 project(makingOfMoon)
@@ -21,6 +25,10 @@ set(SOURCE_FILES
         ${SRC_DIR}/common.hpp
         ${SRC_DIR}/main.cpp
         ${SRC_DIR}/sim/ParticleSimI.hpp
+        ${SRC_DIR}/sim/GravitySim.hpp
+        ${SRC_DIR}/sim/GravitySim.cpp
+        ${SRC_DIR}/util/Timer.hpp
+        ${SRC_DIR}/util/Timer.cpp
         ${SRC_DIR}/sim/Particle.hpp
         ${SRC_DIR}/sim/StaticVecFieldRndSim.cpp
         ${SRC_DIR}/sim/StaticVecFieldRndSim.hpp src/util/StaticSphere.cpp src/util/StaticSphere.hpp src/util/ParticleSphere.cpp src/util/ParticleSphere.hpp src/sim/RndAccelFieldSim.cpp src/sim/RndAccelFieldSim.hpp)
@@ -45,7 +53,8 @@ target_include_directories(${PROJECT_NAME} PRIVATE "${GLM_DIR}/include")
 
 
 # glfw
-set(GLFW_DIR "${LIB_DIR}/glfw3")
-add_subdirectory("${GLFW_DIR}")
-target_link_libraries(${PROJECT_NAME} "glfw" "${GLFW_LIBRARIES}")
-target_include_directories(${PROJECT_NAME} PRIVATE "${GLFW_DIR}/include")
+set(GLFW_BUILD_DOCS OFF CACHE BOOL "" FORCE)
+set(GLFW_BUILD_TESTS OFF CACHE BOOL "" FORCE)
+set(GLFW_BUILD_EXAMPLES OFF CACHE BOOL "" FORCE)
+find_package(glfw3 3.2 REQUIRED)
+target_link_libraries(${PROJECT_NAME} ${CMAKE_DL_LIBS} glfw)

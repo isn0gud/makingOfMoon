@@ -4,7 +4,7 @@
 
 #include "StaticVecFieldRndSim.hpp"
 
-void StaticVecFieldRndSim::updateStep(int numTimeSteps) {
+void StaticVecFieldRndSim::updateStep(int numTimeSteps, float dt) {
 
     for (Particle *p : particles) {
         p->velo = p->velo + p->accel * (float) numTimeSteps;

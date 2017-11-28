@@ -15,8 +15,12 @@ public:
 
 
     virtual std::vector<Particle *> getParticles()= 0;
+    void updateStep(int numTimeSteps)
+    {
+        updateStep(numTimeSteps, 1);
+    }
 
-    virtual void updateStep(int numTimeSteps)= 0;
+    virtual void updateStep(int numTimeSteps, float stepSize)= 0;
 
 };
 

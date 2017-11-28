@@ -21,7 +21,7 @@ public:
     RndAccelFieldSim();
     std::vector<Particle *> getParticles() override;
 
-    void updateStep(int numTimeSteps) override;
+    void updateStep(int numTimeSteps, float stepSize) override;
 
 private:
     glm::vec3 gravityAccelToCenter(glm::vec3 pos) const;

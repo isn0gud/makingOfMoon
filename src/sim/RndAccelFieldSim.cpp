@@ -21,7 +21,7 @@ const float G = 6.67300E-11;
 #define PARTICLE_SIZE 0.05f
 
 
-void RndAccelFieldSim::updateStep(int numTimeSteps) {
+void RndAccelFieldSim::updateStep(int numTimeSteps, float dt) {
 
     for (Particle *p : particles) {
         glm::vec3 total_grav = glm::vec3(0);

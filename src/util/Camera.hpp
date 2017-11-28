@@ -5,7 +5,7 @@
 #ifndef ASS_OPENGL_CAMERA_H
 #define ASS_OPENGL_CAMERA_H
 
-#import "../common.hpp"
+#include "../common.hpp"
 
 class Camera {
 
@@ -14,15 +14,15 @@ public:
 #define WINDOW_WIDTH 800.0f
 #define WINDOW_HEIGHT 600.0f
 #define ROTATION_SPEED 0.002f
-#define MOVEMENT_SPEED 0.1f
-#define INIT_CAMERA_DIST 2.0f
+#define MOVEMENT_SPEED 1.f
+#define INIT_CAMERA_DIST 2.5f
 
 private:
     float rot_speed = ROTATION_SPEED;
     float m_speed = MOVEMENT_SPEED;
 
     static glm::mat4 getPerspective(float width, float height) {
-        return glm::perspective(45.0f, width / height, 0.01f, 10.0f);
+        return glm::perspective(45.0f, width / height, 0.1f, 1000.0f);
     }
 
     glm::vec3 m_up = glm::vec3(0.0f, 1.0f, 0.0f); // y is up
@@ -46,8 +46,8 @@ public:
 
     //init the camera looking to the center from INIT_CAMERA_DIST away in x direction
     Camera() {
-        m_position = glm::vec3(INIT_CAMERA_DIST, 0.0f, 0.0f);
-        m_direction = glm::vec3(-1.0f, 0.0f, 0.0f);
+        m_position = glm::vec3(0, 0.0f, INIT_CAMERA_DIST);
+        m_direction = glm::vec3(0.0f, 0.0f, -1.0f);
     }
 
 

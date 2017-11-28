@@ -7,11 +7,12 @@
 #include "sim/ParticleSimI.hpp"
 #include "sim/StaticVecFieldRndSim.hpp"
 #include "util/Sphere.hpp"
+#include "util/Timer.hpp"
 
 #include "util/StaticSphere.hpp"
 #include "util/ParticleSphere.hpp"
 #include "sim/RndAccelFieldSim.hpp"
-
+#include "sim/GravitySim.hpp"
 using namespace std;
 using namespace glm;
 using namespace agp;
@@ -93,27 +94,27 @@ ParticleSimI *sim = nullptr;
 bool stopSim = true;
 
 
-void key_callback(GLFWwindow *window, int key, int scancode, int action, int mods) {
-
-//    if (action == GLFW_PRESS) {
-    if (key == GLFW_KEY_ESCAPE) {
-        glfwSetWindowShouldClose(window, true);
-    } else if (key == GLFW_KEY_UP) {
-        if (cam)
-            cam->applyMovement(Camera::FORWARD);
-    } else if (key == GLFW_KEY_DOWN) {
-        if (cam)
-            cam->applyMovement(Camera::BACKWARD);
-    } else if (key == GLFW_KEY_LEFT) {
-        if (cam)
-            cam->applyMovement(Camera::STRAFE_RIGHT);
-    } else if (key == GLFW_KEY_RIGHT) {
-        if (cam)
-            cam->applyMovement(Camera::STRAFE_LEFT);
-    } else if (key == GLFW_KEY_SPACE && action == GLFW_PRESS) {
-        stopSim = !stopSim;
+void key_callback(GLFWwindow *window, int key, int scancode, int action, int mods)
+{
+    if (action == GLFW_PRESS) {
+        if (key == GLFW_KEY_ESCAPE) {
+            glfwSetWindowShouldClose(window, true);
+        } else if (key == GLFW_KEY_UP) {
+            if (cam)
+                cam->applyMovement(Camera::FORWARD);
+        } else if (key == GLFW_KEY_DOWN) {
+            if (cam)
+                cam->applyMovement(Camera::BACKWARD);
+        } else if (key == GLFW_KEY_LEFT) {
+            if (cam)
+                cam->applyMovement(Camera::STRAFE_RIGHT);
+        } else if (key == GLFW_KEY_RIGHT) {
+            if (cam)
+                cam->applyMovement(Camera::STRAFE_LEFT);
+        } else if (key == GLFW_KEY_SPACE) {
+            stopSim = !stopSim;
+        }
     }
-//    }
 }
 
 bool mousePressed = false;
@@ -194,38 +195,30 @@ int main(int argc, char **argv) {
 
     glUseProgram(shaderProgram);
 
-
-    sim = new RndAccelFieldSim();
+    sim = new GravitySim();
 
     std::vector<Sphere *> spheres;
-
-#define MOCK_COORDSYSTEM false
-    if (MOCK_COORDSYSTEM) {
-
-        spheres.push_back(new StaticSphere(glm::vec3(0.0f, 0.0f, 0.0f), glm::vec4(0.0f, 0.0f, 0.0f, 0.2f), 0.01f));
-        spheres.push_back(new StaticSphere(glm::vec3(1.0f, 0.0f, 0.0f), glm::vec4(0.0f, 0.0f, 0.0f, 0.2f), 0.01f));
-        spheres.push_back(new StaticSphere(glm::vec3(0.0f, 1.0f, 0.0f), glm::vec4(0.0f, 0.0f, 0.0f, 0.2f), 0.01f));
-        spheres.push_back(new StaticSphere(glm::vec3(0.0f, 0.0f, 1.0f), glm::vec4(0.0f, 0.0f, 0.0f, 0.2f), 0.01f));
-    }
-
 // Sun
 //    spheres.push_back(new StaticSphere(glm::vec3(0.0f, 0.0f, 0.0f), glm::vec4(1.0f, 0.0f, 0.0f, 0.2f), 0.1f));
 
     cam = new Camera();
 
+    Timer timer;
+    timer.start();
 
     std::vector<Particle *> particles = sim->getParticles();
-
     for (Particle *p :particles) {
         spheres.push_back(new ParticleSphere(p));
     }
-
 
     int i = 0;
     // Launch the main loop for rendering
     while (!glfwWindowShouldClose(window)) {
         if (!stopSim && sim) {
-            sim->updateStep(1);
+            float frameTime = timer.getFrameTime();
+            if(frameTime > 0.1)
+                frameTime = 0.1;
+            sim->updateStep(1, frameTime);
 //            stopSim = !stopSim;
         }
         display(window, *cam, spheres, shaderProgram);

@@ -5,7 +5,7 @@
 #ifndef ASS_OPENGL_STATICVECFIELDCOMPUTATION_HPP
 #define ASS_OPENGL_STATICVECFIELDCOMPUTATION_HPP
 
-#import "../common.hpp"
+#include "../common.hpp"
 #include "Particle.hpp"
 #include "ParticleSimI.hpp"
 
@@ -23,7 +23,7 @@ public:
 
     std::vector<Particle *> getParticles() override;
 
-    void updateStep(int numTimeSteps) override;
+    void updateStep(int numTimeSteps, float stepSize) override;
 
 };
 
