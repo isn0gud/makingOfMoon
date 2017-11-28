@@ -3,7 +3,6 @@
 //
 
 #include "GravitySim.hpp"
-#include "LatticeBuilder.hpp"
 #include <cmath>
 
 #define CUBE_SIDE 5
