@@ -1,60 +1,98 @@
 cmake_minimum_required(VERSION 3.5)
-if(APPLE)
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -framework Cocoa -framework OpenGL -framework IOKit -framework CoreVideo -framework GLUT") # compiler version and compiler flags.
-endif()
-if(UNIX AND NOT APPLE)
-     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
-endif()
 
+
+enable_language(CXX)
+
+set(CMAKE_INSTALL_PREFIX "lib/builds")
+
+set(GLEW_LOCATION "lib/glew-2.1.0")
+
+set(OPENGL_INCLUDE_DIR "lib/glfw-3.2.1/include")
+
+set(GLFW_LOCATION "lib/glfw-3.2.1/glfw_compiled/usr/local") # compile with "make install DESTDIR=glfw_compiled"
+
+set(GLM_INCLUDE_DIR "lib/glm")
+
+list(APPEND CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/cmake)
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR})
+
+
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
+
+find_package(GLM REQUIRED)
+find_package(GLFW REQUIRED)
+find_package(GLEW REQUIRED)
+find_package(OpenGL REQUIRED)
 
 project(makingOfMoon)
 
 
-set(LIB_DIR "${CMAKE_CURRENT_SOURCE_DIR}/lib")
-set(SRC_DIR "${CMAKE_CURRENT_SOURCE_DIR}/src")
+set(SRC_DIR "${CMAKE_CURRENT_SOURCE_DIR}/src/nbody")
 
 
 set(SOURCE_FILES
-        ${SRC_DIR}/util/util.cpp
-        ${SRC_DIR}/util/util.hpp
-        ${SRC_DIR}/util/Camera.cpp
-        ${SRC_DIR}/util/Camera.hpp
-        ${SRC_DIR}/util/Sphere.hpp
-        ${SRC_DIR}/util/sphereGLUT.hpp
-        ${SRC_DIR}/util/sphereGLUT.cpp
-        ${SRC_DIR}/common.hpp
-        ${SRC_DIR}/main.cpp
-        ${SRC_DIR}/sim/ParticleSimI.hpp
-        ${SRC_DIR}/sim/GravitySim.hpp
-        ${SRC_DIR}/sim/GravitySim.cpp
-        ${SRC_DIR}/util/Timer.hpp
-        ${SRC_DIR}/util/Timer.cpp
-        ${SRC_DIR}/sim/Particle.hpp
-        ${SRC_DIR}/sim/StaticVecFieldRndSim.cpp
-        ${SRC_DIR}/sim/StaticVecFieldRndSim.hpp src/util/StaticSphere.cpp src/util/StaticSphere.hpp src/util/ParticleSphere.cpp src/util/ParticleSphere.hpp src/sim/RndAccelFieldSim.cpp src/sim/RndAccelFieldSim.hpp)
+        src/render/shaderUtil.cpp
+        src/render/shaderUtil.hpp
+        src/render/ParticleRenderer.cpp
+        src/render/ParticleRenderer.hpp
+        src/render/Camera.cpp
+        src/render/Camera.hpp
+        src/sim/gen.cpp
+        src/sim/gen.hpp
+        src/main.cpp
+        )
+
 
 
 add_executable(makingOfMoon ${SOURCE_FILES})
 
+target_compile_features(makingOfMoon PRIVATE cxx_auto_type cxx_nullptr cxx_range_for)
+
+target_include_directories(makingOfMoon PRIVATE
+        ${GLM_INCLUDE_DIRS}
+        ${GLFW_INCLUDE_DIR}
+        ${GLEW_INCLUDE_DIR}
+        ${OPENGL_INCLUDE_DIR})
+
+target_link_libraries(makingOfMoon ${GLFW_LIBRARIES} ${GLEW_LIBRARY} ${OPENGL_gl_LIBRARY})
+
+
 # glad
-set(GLAD_DIR "${LIB_DIR}/glad")
-add_library("glad" "${GLAD_DIR}/src/glad.c")
-include_directories(${GLAD_DIR}/include)
-target_include_directories("glad" PRIVATE "${GLAD_DIR}/include")
-target_include_directories(${PROJECT_NAME} PRIVATE "${GLAD_DIR}/include")
-target_link_libraries(${PROJECT_NAME} "glad" "${CMAKE_DL_LIBS}")
+#set(GLAD_DIR "${LIB_DIR}/glad")
+#add_library("glad" "${GLAD_DIR}/src/glad.c")
+#include_directories(${GLAD_DIR}/include)
+#target_include_directories("glad" PRIVATE "${GLAD_DIR}/include")
+#target_include_directories(${PROJECT_NAME} PRIVATE "${GLAD_DIR}/include")
+#target_link_libraries(${PROJECT_NAME} "glad" "${CMAKE_DL_LIBS}")
 
-
-# glm
-set(GLM_DIR "${LIB_DIR}/glm")
-add_subdirectory("${GLM_DIR}")
-target_link_libraries(${PROJECT_NAME} "glm" "${GLM_LIBRARIES}")
-target_include_directories(${PROJECT_NAME} PRIVATE "${GLM_DIR}/include")
-
-
-# glfw
-set(GLFW_BUILD_DOCS OFF CACHE BOOL "" FORCE)
-set(GLFW_BUILD_TESTS OFF CACHE BOOL "" FORCE)
-set(GLFW_BUILD_EXAMPLES OFF CACHE BOOL "" FORCE)
-find_package(glfw3 3.2 REQUIRED)
-target_link_libraries(${PROJECT_NAME} ${CMAKE_DL_LIBS} glfw)
+#
+## glm
+#set(GLM_DIR "${LIB_DIR}/glm")
+#add_subdirectory("${GLM_DIR}")
+#target_link_libraries(${PROJECT_NAME} "glm" "${GLM_LIBRARIES}")
+#target_include_directories(${PROJECT_NAME} PRIVATE "${GLM_DIR}/include")
+#
+#
+## glfw
+#set(GLFW_DIR "${LIB_DIR}/glfw3")
+#add_subdirectory("${GLFW_DIR}")
+#target_link_libraries(${PROJECT_NAME} "glfw" "${GLFW_LIBRARIES}")
+#target_include_directories(${PROJECT_NAME} PRIVATE "${GLFW_DIR}/include")
+#
+#
+#
+## glew
+#
+##set(GLEW_DIR "${LIB_DIR}/glew-2.1.0/build/cmake")
+##add_subdirectory("${GLEW_DIR}")
+##target_link_libraries(${PROJECT_NAME} "glew" "${GLEW_LIBRARIES}")
+##target_include_directories(${PROJECT_NAME} PRIVATE "${GLEW_DIR}/include")
+#
+#
+#
+#list(APPEND CMAKE_PREFIX_PATH "lib/glew-2.1.0")
+#find_package(GLEW REQUIRED)
+#if (GLEW_FOUND)
+#    include_directories(${GLEW_INCLUDE_DIRS})
+#    link_libraries(${GLEW_LIBRARIES})
+#endif()
