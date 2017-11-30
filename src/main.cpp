@@ -5,13 +5,11 @@
 #include "util/Camera.hpp"
 #include "util/Sphere.hpp"
 #include "sim/ParticleSimI.hpp"
-#include "sim/StaticVecFieldRndSim.hpp"
 #include "util/Sphere.hpp"
 #include "util/Timer.hpp"
 
 #include "util/StaticSphere.hpp"
 #include "util/ParticleSphere.hpp"
-#include "sim/RndAccelFieldSim.hpp"
 #include "sim/GravitySim.hpp"
 using namespace std;
 using namespace glm;

@@ -10,18 +10,23 @@
 
 
 glm::mat4 ParticleSphere::getModel() const {
-    return glm::translate(glm::mat4(1), particle->pos);
+    return glm::translate(glm::mat4(1), (particle->pos * SCALING));
 }
 
 glm::vec4 ParticleSphere::getColor() const {
-//    return glm::vec4(0.1f, 0.1f, 0.4f, alpha);
-
-    return glm::vec4(glm::vec3(particle->mass), alpha);
+    switch (particle->type) {
+        case Particle::TYPE::IRON:
+            return glm::vec4(0.8f, 0.1f, 0.1f, alpha);
+        case Particle::TYPE::SILICATE:
+            return glm::vec4(0.8f, 0.8f, 0.1f, alpha);
+        default:
+            return glm::vec4(0.8f, 0.8f, 0.8f, alpha);
+    }
 }
 
 
 GLfloat ParticleSphere::getRadius() const {
-    return particle->radius;
+    return particle->radius * (GLfloat) SCALING;
 }
 
 GLint ParticleSphere::getSlices() const {

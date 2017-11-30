@@ -13,8 +13,7 @@ class ParticleSphere : public Sphere {
 #define VELO_TO_COLOR_SCALING 10.0
 #define DEFAULT_SLICES 15
 #define DEFAULT_STACKS 15
-#define SPHERE_SIZE 0.05f
-
+#define SCALING 1.0f
 
 public:
 //    void setAlpha(float alpha) override;
@@ -37,7 +36,7 @@ public:
 private:
 
     Particle *particle;
-    float alpha = 0.2f;
+    float alpha = 0.1f;
 //    GLfloat radius;
     GLint slices;
     GLint stacks;

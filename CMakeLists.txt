@@ -30,9 +30,11 @@ set(SOURCE_FILES
         ${SRC_DIR}/util/Timer.hpp
         ${SRC_DIR}/util/Timer.cpp
         ${SRC_DIR}/sim/Particle.hpp
-        ${SRC_DIR}/sim/StaticVecFieldRndSim.cpp
-        ${SRC_DIR}/sim/StaticVecFieldRndSim.hpp src/util/StaticSphere.cpp src/util/StaticSphere.hpp src/util/ParticleSphere.cpp src/util/ParticleSphere.hpp src/sim/RndAccelFieldSim.cpp src/sim/RndAccelFieldSim.hpp)
-
+        src/util/StaticSphere.cpp
+        src/util/StaticSphere.hpp
+        src/util/ParticleSphere.cpp
+        src/util/ParticleSphere.hpp
+        )
 
 add_executable(makingOfMoon ${SOURCE_FILES})
 

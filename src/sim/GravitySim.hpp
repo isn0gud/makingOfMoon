@@ -20,6 +20,8 @@ public:
     std::vector<Particle *> getParticles() override;
 
     void updateStep(int numTimeSteps, float dt) override;
+
+    virtual ~GravitySim();
 };
 
 
