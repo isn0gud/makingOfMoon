@@ -1,5 +1,8 @@
 # makingOfMoon
 
+We copy/take inspiration from the cuda toolkit nbody example. This can be found in the local cuda installation in "samples/5_Simulations/nbody/".
+
+Furthermore we give the same courtesy to "https://github.com/PLeLuron/nbody"
 
 
 #TODO
