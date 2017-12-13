@@ -2,8 +2,8 @@
 // Created by Karl Kvarnfors on 26/11/2017.
 //
 
-#ifndef ASS_OPENGL_GRAVITYSIM_HPP
-#define ASS_OPENGL_GRAVITYSIM_HPP
+#ifndef AGP_PROJECT_GRAVITYSIM_HPP
+#define AGP_PROJECT_GRAVITYSIM_HPP
 
 #include "ParticleSimI.hpp"
 
@@ -17,12 +17,12 @@ private:
 public:
     GravitySim();
 
-    std::vector<Particle *> getParticles() override;
+    const std::vector<Particle *>& getParticles() override;
 
-    void updateStep(int numTimeSteps, float dt) override;
+    void updateStep(int numTimeSteps) override;
 
     virtual ~GravitySim();
 };
 
 
-#endif //ASS_OPENGL_GRAVITYSIM_HPP
+#endif //AGP_PROJECT_GRAVITYSIM_HPP

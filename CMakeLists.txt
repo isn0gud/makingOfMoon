@@ -17,11 +17,9 @@ set(SRC_DIR "${CMAKE_CURRENT_SOURCE_DIR}/src")
 set(SOURCE_FILES
         ${SRC_DIR}/util/util.cpp
         ${SRC_DIR}/util/util.hpp
-        ${SRC_DIR}/util/Camera.cpp
-        ${SRC_DIR}/util/Camera.hpp
-        ${SRC_DIR}/util/Sphere.hpp
-        ${SRC_DIR}/util/sphereGLUT.hpp
-        ${SRC_DIR}/util/sphereGLUT.cpp
+        ${SRC_DIR}/viz/Camera.cpp
+        ${SRC_DIR}/viz/Camera.hpp
+        ${SRC_DIR}/viz/Sphere.hpp
         ${SRC_DIR}/common.hpp
         ${SRC_DIR}/main.cpp
         ${SRC_DIR}/sim/ParticleSimI.hpp
@@ -30,10 +28,22 @@ set(SOURCE_FILES
         ${SRC_DIR}/util/Timer.hpp
         ${SRC_DIR}/util/Timer.cpp
         ${SRC_DIR}/sim/Particle.hpp
-        src/util/StaticSphere.cpp
-        src/util/StaticSphere.hpp
-        src/util/ParticleSphere.cpp
-        src/util/ParticleSphere.hpp
+        ${SRC_DIR}/viz/StaticSphere.cpp
+        ${SRC_DIR}/viz/StaticSphere.hpp
+        ${SRC_DIR}/viz/ParticleSphere.cpp
+        ${SRC_DIR}/viz/ParticleSphere.hpp
+        ${SRC_DIR}/viz/Renderer.cpp
+        ${SRC_DIR}/viz/Renderer.hpp
+        ${SRC_DIR}/viz/RendererInputHandler.hpp
+        ${SRC_DIR}/viz/RendererInputHandler.cpp
+        ${SRC_DIR}/sim/PlanetBuilder.cpp
+        ${SRC_DIR}/sim/PlanetBuilder.hpp
+        ${SRC_DIR}/util/WindowManager.hpp
+        ${SRC_DIR}/util/WindowManager.cpp
+        ${SRC_DIR}/viz/Model.hpp
+        ${SRC_DIR}/viz/Model.cpp
+        ${SRC_DIR}/viz/GeometryBuilder.hpp
+        ${SRC_DIR}/viz/GeometryBuilder.cpp
         )
 
 add_executable(makingOfMoon ${SOURCE_FILES})

@@ -1,5 +1,5 @@
-#ifndef _AGP_UTIL_H
-#define _AGP_UTIL_H
+#ifndef AGP_PROJECT_UTIL_HPP
+#define AGP_PROJECT_UTIL_HPP
 
 #include "../common.hpp"
 

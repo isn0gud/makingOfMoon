@@ -1,5 +1,5 @@
-#ifndef _COMMON_H
-#define _COMMON_H
+#ifndef AGP_PROJECT_COMMON_HPP
+#define AGP_PROJECT_COMMON_HPP
 
 #include <iostream>
 #include <cstdio>

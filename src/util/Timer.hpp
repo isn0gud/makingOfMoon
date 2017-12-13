@@ -1,5 +1,5 @@
-#ifndef ASS_OPENGL_TIMER_H
-#define ASS_OPENGL_TIMER_H
+#ifndef AGP_PROJECT_TIMER_HPP
+#define AGP_PROJECT_TIMER_HPP
 
 #include "../common.hpp"
 
@@ -18,4 +18,4 @@ public:
 
 };
 
-#endif // ASS_OPENGL_TIMER_H
+#endif // AGP_PROJECT_TIMER_HPP

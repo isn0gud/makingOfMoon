@@ -2,11 +2,10 @@
 // Created by Pius Friesch on 19/11/2017.
 //
 
-#ifndef ASS_OPENGL_PARTICLE_HPP
-#define ASS_OPENGL_PARTICLE_HPP
+#ifndef AGP_PROJECT_PARTICLE_HPP
+#define AGP_PROJECT_PARTICLE_HPP
 
 #include "../common.hpp"
-
 
 class Particle {
 
@@ -78,21 +77,30 @@ public:
               type(type) {}
 
 
-    static Particle *silicateParticle(glm::vec3 pos) {
-        return new Particle(pos, glm::vec3(0), glm::vec3(0), 0.1, 1e7, 0.9, 1e7 * 25.0f, 0.01,
-                            Particle::TYPE::SILICATE);
+    static Particle *particleFromType(TYPE type, float radius) {
+        float mass = 0;
+        float SDF = 0;
+        float K = 0;
+        float KRF = 0;
 
+        switch(type)
+        {
+        case Particle::TYPE::SILICATE:
+            mass = 7.4161E19 * pow(radius / 188.39, 3);
+            SDF = 1 - 0.001;
+            K = 7.2785E10; // TODO: Should probably scale with radius somehow
+            KRF = 0.01;
+            break;
+        case Particle::TYPE::IRON:
+            mass = 1.9549E20 * pow(radius / 188.39, 3);
+            SDF = 1 - 0.01;
+            K = 2.9114E11; // TODO: Should probably scale with radius somehow
+            KRF = 0.02;
+            break;
+        }
+
+        return new Particle(glm::vec3(0), glm::vec3(0), glm::vec3(0), radius, mass, SDF, K, KRF, type);
     }
-
-    static Particle *ironParticle(glm::vec3 pos) {
-
-        //D: 376.78 /2 = 188.39
-        //SDP_Fe of D = 0.01 / 2
-        //K_Fe = 2.9114E11 =
-        return new Particle(pos, glm::vec3(0), glm::vec3(0), 0.1, 1e7, 0.9, 1e7 * 25.0f, 0.01,
-                            Particle::TYPE::IRON);
-    }
-
 
 // REAL VALUES:
 
@@ -115,4 +123,4 @@ public:
 };
 
 
-#endif //ASS_OPENGL_PARTICLE_HPP
+#endif //AGP_PROJECT_PARTICLE_HPP
