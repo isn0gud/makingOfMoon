@@ -72,7 +72,7 @@ int main(int argc, char **argv) {
             particlesPos[i] = p;
             particlesVel[i] = v;
         }
-        renderer.populateParticles(particlesPos, particlesVel);
+        renderer.setParticles(particlesPos);
     }
     //TODO setup particles
 

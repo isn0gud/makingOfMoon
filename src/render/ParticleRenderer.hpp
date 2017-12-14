@@ -24,17 +24,12 @@ public:
     void destroy();
 
     /**
- * Supplies the gl state with initial particle position and velocity
+ * Supplies the gl state with particle position and velocity
  * @param pos particle positions
  * @param vel particle velocities
  */
-    void populateParticles(const std::vector<glm::vec4> pos,
-                           const std::vector<glm::vec4> vel);
+    void setParticles(const std::vector<glm::vec4> pos);
 
-    /**
- * Steps the simulation once, with the parameters provided with @see init
- */
-    void stepSim();
 
     /**
  * Renders the particles at the current step
@@ -65,13 +60,13 @@ private:
     GLuint flareTex{};           ///< Texture for the star flare
     GLuint vaoParticles{};       ///< Vertex definition for points
     GLuint vboParticlesPos{};   ///< Particle position buffer
-    GLuint ssboVelocities{};     ///< Particle velocity buffer
+//    GLuint ssboVelocities{};     ///< Particle velocity buffer
     GLuint vaoDeferred{};        ///< Vertex definition for deferred
     GLuint vboDeferred{};        ///< Vertex buffer of deferred fullscreen tri
 
     /** Shader programs **/
-    ShaderProgram programInteraction; ///< Gravity interaction step
-    ShaderProgram programIntegration; ///< Position integration step
+//    ShaderProgram programInteraction; ///< Gravity interaction step
+//    ShaderProgram programIntegration; ///< Position integration step
     ShaderProgram programHdr;         ///< HDR rendering step
     ShaderProgram programBlur;        ///< Bloom blurring step
     ShaderProgram programLum;         ///< Average luminance step
@@ -87,6 +82,11 @@ private:
     int height_{};                 ///< Viewport height
 
     size_t numParticles{};
-    size_t computeIterations{};
+//    size_t computeIterations{};
+
+
+    glm::vec4 *particlePosPointer;
+    int num_particles;
+
 
 };
