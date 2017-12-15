@@ -24,24 +24,41 @@ find_package(GLFW REQUIRED)
 find_package(GLEW REQUIRED)
 find_package(OpenGL REQUIRED)
 
+
 project(makingOfMoon)
 
 
-set(SRC_DIR "${CMAKE_CURRENT_SOURCE_DIR}/src/nbody")
-
-
 set(SOURCE_FILES
+        src/util/util.cpp
+        src/util/util.hpp
+        src/viz/Camera.cpp
+        src/viz/Camera.hpp
+        src/viz/Sphere.hpp
         src/common.hpp
-        src/render/shaderUtil.cpp
-        src/render/shaderUtil.hpp
-        src/render/ParticleRenderer.cpp
-        src/render/ParticleRenderer.hpp
-        src/render/Camera.cpp
-        src/render/Camera.hpp
         src/main.cpp
-        src/sim/Particles.h src/sim/RndTestSim.cpp src/sim/RndTestSim.h)
-
-
+        src/sim/ParticleSimI.hpp
+        src/sim/GravitySim.hpp
+        src/sim/GravitySim.cpp
+        src/util/Timer.hpp
+        src/util/Timer.cpp
+        src/sim/Particle.hpp
+        src/viz/StaticSphere.cpp
+        src/viz/StaticSphere.hpp
+        src/viz/ParticleSphere.cpp
+        src/viz/ParticleSphere.hpp
+        src/viz/Renderer.cpp
+        src/viz/Renderer.hpp
+        src/viz/RendererInputHandler.hpp
+        src/viz/RendererInputHandler.cpp
+        src/sim/PlanetBuilder.cpp
+        src/sim/PlanetBuilder.hpp
+        src/util/WindowManager.hpp
+        src/util/WindowManager.cpp
+        src/viz/Model.hpp
+        src/viz/Model.cpp
+        src/viz/GeometryBuilder.hpp
+        src/viz/GeometryBuilder.cpp
+        )
 
 add_executable(makingOfMoon ${SOURCE_FILES})
 
@@ -55,43 +72,3 @@ target_include_directories(makingOfMoon PRIVATE
 
 target_link_libraries(makingOfMoon ${GLFW_LIBRARIES} ${GLEW_LIBRARY} ${OPENGL_gl_LIBRARY})
 
-
-# glad
-#set(GLAD_DIR "${LIB_DIR}/glad")
-#add_library("glad" "${GLAD_DIR}/src/glad.c")
-#include_directories(${GLAD_DIR}/include)
-#target_include_directories("glad" PRIVATE "${GLAD_DIR}/include")
-#target_include_directories(${PROJECT_NAME} PRIVATE "${GLAD_DIR}/include")
-#target_link_libraries(${PROJECT_NAME} "glad" "${CMAKE_DL_LIBS}")
-
-#
-## glm
-#set(GLM_DIR "${LIB_DIR}/glm")
-#add_subdirectory("${GLM_DIR}")
-#target_link_libraries(${PROJECT_NAME} "glm" "${GLM_LIBRARIES}")
-#target_include_directories(${PROJECT_NAME} PRIVATE "${GLM_DIR}/include")
-#
-#
-## glfw
-#set(GLFW_DIR "${LIB_DIR}/glfw3")
-#add_subdirectory("${GLFW_DIR}")
-#target_link_libraries(${PROJECT_NAME} "glfw" "${GLFW_LIBRARIES}")
-#target_include_directories(${PROJECT_NAME} PRIVATE "${GLFW_DIR}/include")
-#
-#
-#
-## glew
-#
-##set(GLEW_DIR "${LIB_DIR}/glew-2.1.0/build/cmake")
-##add_subdirectory("${GLEW_DIR}")
-##target_link_libraries(${PROJECT_NAME} "glew" "${GLEW_LIBRARIES}")
-##target_include_directories(${PROJECT_NAME} PRIVATE "${GLEW_DIR}/include")
-#
-#
-#
-#list(APPEND CMAKE_PREFIX_PATH "lib/glew-2.1.0")
-#find_package(GLEW REQUIRED)
-#if (GLEW_FOUND)
-#    include_directories(${GLEW_INCLUDE_DIRS})
-#    link_libraries(${GLEW_LIBRARIES})
-#endif()
