@@ -28,7 +28,7 @@ public:
  * @param pos particle positions
  * @param vel particle velocities
  */
-    void setParticles(const std::vector<glm::vec4> pos);
+    glm::vec4 * setParticles(const std::vector<glm::vec4> &pos);
 
 
     /**
@@ -85,8 +85,8 @@ private:
 //    size_t computeIterations{};
 
 
-    glm::vec4 *particlePosPointer;
-    int num_particles;
+//    glm::vec4 *particlePosPointer;
+//    int num_particles;
 
 
 };

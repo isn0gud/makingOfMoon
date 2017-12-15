@@ -31,16 +31,15 @@ set(SRC_DIR "${CMAKE_CURRENT_SOURCE_DIR}/src/nbody")
 
 
 set(SOURCE_FILES
+        src/common.hpp
         src/render/shaderUtil.cpp
         src/render/shaderUtil.hpp
         src/render/ParticleRenderer.cpp
         src/render/ParticleRenderer.hpp
         src/render/Camera.cpp
         src/render/Camera.hpp
-        src/sim/gen.cpp
-        src/sim/gen.hpp
         src/main.cpp
-        )
+        src/sim/Particles.h src/sim/RndTestSim.cpp src/sim/RndTestSim.h)
 
 
 

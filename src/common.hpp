@@ -28,6 +28,7 @@
 #include <vector>
 #include <stdint.h>
 #include <glm/vec3.hpp>
+#include <glm/vec4.hpp>
 #include <chrono>
 
 #define PATH_MAX  4096

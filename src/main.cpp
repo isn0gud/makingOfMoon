@@ -9,8 +9,9 @@
 #include <chrono>
 #include <thread>
 
-#include "sim/gen.hpp"
 #include "render/Camera.hpp"
+#include "sim/Particles.h"
+#include "sim/RndTestSim.h"
 
 double scroll = 0;
 
@@ -61,20 +62,26 @@ int main(int argc, char **argv) {
 
     renderer.init(window, width, height);
 
+    Particles *particles = new Particles;
+
+
     // Pos&vel init
     {
         vector<glm::vec4> particlesPos(NUM_PARTICLES);
         vector<glm::vec4> particlesVel(NUM_PARTICLES);
         for (size_t i = 0; i < NUM_PARTICLES; ++i) {
-            glm::vec4 p = randomParticlePos();
-            glm::vec4 v = randomParticleVel(p);
+            glm::vec4 p = RndTestSim::randomParticlePos();
+            glm::vec4 v = RndTestSim::randomParticleVel(p);
 
             particlesPos[i] = p;
             particlesVel[i] = v;
         }
-        renderer.setParticles(particlesPos);
+        particles->num_particles = NUM_PARTICLES;
+        particles->particlePos = renderer.setParticles(particlesPos);
     }
-    //TODO setup particles
+    RndTestSim sim(particles);
+//    assert(&particles->particlePos == &sim.particles.particlePos);
+//    assert(sim.particles.particlePos);
 
 
     Camera camera;
@@ -140,6 +147,7 @@ int main(int argc, char **argv) {
 
         camera.step();
 
+        sim.step();
 //        renderer.stepSim();
         //TODO STEP
         renderer.render(camera.getProj(width, height), camera.getView());

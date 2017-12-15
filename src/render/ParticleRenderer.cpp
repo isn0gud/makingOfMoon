@@ -19,7 +19,7 @@ void ParticleRenderer::init(GLFWwindow *window, int width, int height) {
         throw std::runtime_error("Can't load GL");
     }
 
-    numParticles = NUM_PARTICLES;
+//    numParticles = NUM_PARTICLES;
 //    computeIterations = static_cast<size_t>(MAX_ITER_PER_FRAME);
     setWindowDimensions(width, height);
     createFlareTexture();
@@ -168,15 +168,6 @@ void ParticleRenderer::setUniforms() {
 
 
 void ParticleRenderer::render(glm::mat4 proj_mat, glm::mat4 view_mat) {
-
-
-    for (int i = 0; i < num_particles; ++i) {
-        particlePosPointer[i] += glm::vec4(0.01 * particlePosPointer[i].x, 0.01 * particlePosPointer[i].y,
-                                           0.01 * particlePosPointer[i].z, 1);
-    }
-    //TODO
-
-
     // Particle HDR rendering
     glViewport(0, 0, width_ + 2 * FBO_MARGIN, height_ + 2 * FBO_MARGIN);
     glBindVertexArray(vaoParticles);
@@ -240,36 +231,23 @@ void ParticleRenderer::destroy() {
 
 }
 
-
-//void ParticleRenderer::populateParticles(const vector<glm::vec4> pos, const vector<glm::vec4> vel) {
-//
-//}
-//
-//
-//void ParticleRenderer::stepSim() {
-//    for (size_t i = 0; i < computeIterations; ++i) {
-//        // Interaction step
-//        glMemoryBarrier(GL_SHADER_STORAGE_BARRIER_BIT);
-//        glUseProgram(programInteraction.getId());
-//        glDispatchCompute(static_cast<GLuint>(numParticles / 256), 1, 1);
-//
-//        // Integration step
-//        glUseProgram(programIntegration.getId());GL
-//        glMemoryBarrier(GL_SHADER_STORAGE_BARRIER_BIT);
-//        glDispatchCompute(static_cast<GLuint>(numParticles / 256), 1, 1);
-//    }
-//}
-
-void ParticleRenderer::setParticles(const vector<glm::vec4> pos) {
+glm::vec4 *ParticleRenderer::setParticles(const vector<glm::vec4> &pos) {
     //TODO cuda/cpu interop here
     // SSBO allocation & data upload
-    glNamedBufferStorage(vboParticlesPos, pos.size() * sizeof(glm::vec4), 0, // pos.data(),
+    glNamedBufferStorage(vboParticlesPos, pos.size() * sizeof(glm::vec4), pos.data(),
                          GL_MAP_WRITE_BIT | GL_MAP_READ_BIT | GL_MAP_PERSISTENT_BIT |
                          GL_MAP_COHERENT_BIT); // Buffer storage is fixed size compared to BuferData
-//    glNamedBufferStorage(ssboVelocities, vel.size() * sizeof(glm::vec4), vel.data(), 0);
+    //Mapping gpu memory to cpu memory for easy writes.
 
-//    glm::vec4 *dataPointer(nullptr);
-    num_particles = static_cast<int>(pos.size());
+//    size_t numParticles{};
+//    size_t computeIterations{};
+
+
+    glm::vec4 *particlePosPointer;
+//    int num_particles;
+
+
+    numParticles = pos.size();
     particlePosPointer = (glm::vec4 *) glMapNamedBufferRange(vboParticlesPos, 0, pos.size() * sizeof(glm::vec4),
                                                              GL_MAP_WRITE_BIT | GL_MAP_READ_BIT |
                                                              GL_MAP_PERSISTENT_BIT |
@@ -278,28 +256,8 @@ void ParticleRenderer::setParticles(const vector<glm::vec4> pos) {
     if (!particlePosPointer) {
         GLenum error = glGetError();
         fprintf(stderr, "Buffer map failed! %d (%s)\n", error, glewGetErrorString(error)); //gluErrorString(error));
-        return;
+        return nullptr;
+    } else {
+        return particlePosPointer;
     }
-
-//    printf("%d",pos.size());
-    for (int i = 0; i < pos.size(); ++i) {
-        particlePosPointer[i] = pos[i]; //TODO
-    }
-
-//    void *vertex_buffer_ptr = glMapNamedBuffer(vboParticlesPos, GL_READ_WRITE);
-//
-//    if (!vertex_buffer_ptr) {
-//        GLenum error = glGetError();
-//        fprintf(stderr, "Buffer map failed! %d (%s)\n", error, glewGetErrorString(error)); //gluErrorString(error));
-//        return;
-//    }
-//    glUnmapBuffer(GL_SHADER_STORAGE_BUFFER);
-
-    // SSBO binding
-//    glBindBufferRange(GL_SHADER_STORAGE_BUFFER, 0, vboParticlesPos,
-//                      0, sizeof(glm::vec4) * pos.size());
-
-
-//    glBindBufferRange(GL_SHADER_STORAGE_BUFFER, 1, ssboVelocities,
-//                      0, sizeof(glm::vec4) * vel.size());
 }
