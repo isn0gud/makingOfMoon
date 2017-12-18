@@ -29,8 +29,8 @@ project(makingOfMoon)
 
 
 set(SOURCE_FILES
-        src/util/util.cpp
-        src/util/util.hpp
+        src/util/ShaderProgram.hpp
+        src/util/ShaderProgram.cpp
         src/viz/Camera.cpp
         src/viz/Camera.hpp
         src/viz/Sphere.hpp
@@ -46,8 +46,8 @@ set(SOURCE_FILES
         src/viz/StaticSphere.hpp
         src/viz/ParticleSphere.cpp
         src/viz/ParticleSphere.hpp
-        src/viz/Renderer.cpp
-        src/viz/Renderer.hpp
+        src/viz/ParticleSphereRenderer.cpp
+        src/viz/ParticleSphereRenderer.hpp
         src/viz/RendererInputHandler.hpp
         src/viz/RendererInputHandler.cpp
         src/sim/PlanetBuilder.cpp

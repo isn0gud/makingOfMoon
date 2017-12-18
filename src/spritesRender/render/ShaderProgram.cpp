@@ -1,4 +1,4 @@
-#include "shaderUtil.hpp"
+#include "ShaderProgram.hpp"
 
 #include <string>
 #include <sstream>

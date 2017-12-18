@@ -8,12 +8,16 @@
 #include "Sphere.hpp"
 #include "Model.hpp"
 #include "RendererInputHandler.hpp"
+#include "../util/ShaderProgram.hpp"
 
-class Renderer : public WindowEventListener
+class ParticleSphereRenderer : public WindowEventListener
 {
+private:
+    ShaderProgram programmMain;
+
 protected:
     Camera camera;
-    GLint shaderProgramId;
+//    GLint shaderProgramId;
     Model sphereModel;
 
     float cameraAzimuthAngle;
@@ -27,7 +31,7 @@ public:
 
     void init(int windowWidth, int windowHeight);
     void render(const std::vector<Sphere*>& spheres, float frameTime);
-    void clear();
+//    void clear();
 
     void onWindowSizeChanged(int width, int height);
 };

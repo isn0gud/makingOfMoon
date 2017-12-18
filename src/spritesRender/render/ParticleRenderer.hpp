@@ -5,7 +5,7 @@
 
 #include <vector>
 
-#include "shaderUtil.hpp"
+#include "ShaderProgram.hpp"
 
 class ParticleRenderer {
 public:

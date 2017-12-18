@@ -1,14 +1,14 @@
-#include "Renderer.hpp"
+#include "ParticleSphereRenderer.hpp"
 
 #include "GeometryBuilder.hpp"
-#include "../util/util.hpp"
+#include "../util/ShaderProgram.hpp"
 
 #define CAMERA_SPEED 10000
 #define CAMERA_ROT_SPEED 0.002
 #define PI 3.14159265359
 #define ANGLE_EPSILON 0.1
 
-void Renderer::init(int windowWidth, int windowHeight)
+void ParticleSphereRenderer::init(int windowWidth, int windowHeight)
 {
     // Set OpenGL settings
     glClearColor(0.3f, 0.3f, 0.3f, 0.0f);
@@ -16,9 +16,10 @@ void Renderer::init(int windowWidth, int windowHeight)
     glEnable(GL_DEPTH_TEST);
     glCullFace(GL_BACK);
 
-    // Load shader
-    shaderProgramId = agp::util::loadShaders("shaders/vertexShader.glsl", "shaders/fragmentShader.glsl");
-    glUseProgram(shaderProgramId);
+    // init shader
+    programmMain.source(GL_VERTEX_SHADER, "shaders/vertexShader.glsl");
+    programmMain.source(GL_FRAGMENT_SHADER, "shaders/fragmentShader.glsl");
+    programmMain.link();
 
     // Setup camera
     camera.setProjectionMatrix(45.0f, windowWidth, windowHeight, 1.0f, 100000.0f);
@@ -28,7 +29,7 @@ void Renderer::init(int windowWidth, int windowHeight)
     // Create Model
     vector<vec3> vertices;
     GeometryBuilder::buildSphere(12, 1, vertices);
-    sphereModel.loadVertexData(vertices, shaderProgramId, "aPos");
+    sphereModel.loadVertexData(vertices, programmMain.getId(), "aPos");
 
     WindowManager* wm = WindowManager::getInstance();
     wm->addCursorPositionListener(&inputHandler);
@@ -37,7 +38,7 @@ void Renderer::init(int windowWidth, int windowHeight)
     wm->addWindowEventListener(this);
 }
 
-void Renderer::updateCamera(float frameTime)
+void ParticleSphereRenderer::updateCamera(float frameTime)
 {
     auto inputData = inputHandler.getDerivedData();
     camera.position += camera.orientation * inputData.cameraLocalVelocity * CAMERA_SPEED * frameTime;
@@ -57,7 +58,7 @@ void Renderer::updateCamera(float frameTime)
     camera.setOrientation(cameraForwardVector, glm::vec3(0,1,0));
 }
 
-void Renderer::render(const std::vector<Sphere*>& spheres, float frameTime)
+void ParticleSphereRenderer::render(const std::vector<Sphere*>& spheres, float frameTime)
 {
     // Update
     updateCamera(frameTime);
@@ -68,13 +69,13 @@ void Renderer::render(const std::vector<Sphere*>& spheres, float frameTime)
     for(Sphere* sphere : spheres)
     {
         // Set Model-View-Projection-Matrix
-        GLint MVPUniformLocation = glGetUniformLocation(shaderProgramId, "mvp");
+        GLint MVPUniformLocation = glGetUniformLocation(programmMain.getId(), "mvp");
         glm::mat4 modelTransformationMatrix = sphere->getTransformationMatrix() * glm::scale(glm::vec3(sphere->getRadius()));
         glm::mat4 mvp = camera.getModelViewProjectionMatrix(modelTransformationMatrix);
         glUniformMatrix4fv(MVPUniformLocation, 1, GL_FALSE, glm::value_ptr(mvp));
 
         // Set color
-        GLint colorUniformLocation = glGetUniformLocation(shaderProgramId, "inColor");
+        GLint colorUniformLocation = glGetUniformLocation(programmMain.getId(), "inColor");
         glUniform4fv(colorUniformLocation, 1, glm::value_ptr(sphere->getColor()));
 
         // Draw solid and then set the color to be slightly darker and draw wireframe
@@ -86,12 +87,12 @@ void Renderer::render(const std::vector<Sphere*>& spheres, float frameTime)
     WindowManager::getInstance()->swapBuffers();
 }
 
-void Renderer::clear()
-{
+//void ParticleSphereRenderer::clear()
+//{
+//
+//}
 
-}
-
-void Renderer::onWindowSizeChanged(int width, int height)
+void ParticleSphereRenderer::onWindowSizeChanged(int width, int height)
 {
     camera.updateWindowShape(width, height);
 }

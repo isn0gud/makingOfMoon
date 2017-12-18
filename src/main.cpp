@@ -1,6 +1,6 @@
 
 #include "common.hpp"
-#include "util/util.hpp"
+#include "util/ShaderProgram.hpp"
 #include "viz/Camera.hpp"
 #include "viz/Sphere.hpp"
 #include "sim/ParticleSimI.hpp"
@@ -10,7 +10,7 @@
 #include "viz/StaticSphere.hpp"
 #include "viz/ParticleSphere.hpp"
 #include "viz/Sphere.hpp"
-#include "viz/Renderer.hpp"
+#include "viz/ParticleSphereRenderer.hpp"
 
 #include "sim/GravitySim.hpp"
 #include "util/WindowManager.hpp"
@@ -20,7 +20,7 @@
 
 using namespace std;
 using namespace glm;
-using namespace agp;
+//using namespace agp;
 
 #define MAX_FRAME_TIME 0.1f
 #define WINDOW_WIDTH 800
@@ -62,7 +62,7 @@ int main(int argc, char **argv)
     }
 
     // Init renderer
-    Renderer renderer;
+    ParticleSphereRenderer renderer;
     renderer.init(WINDOW_WIDTH, WINDOW_HEIGHT);
 
     InputHandler input;
@@ -86,7 +86,7 @@ int main(int argc, char **argv)
     }
 
     //calls destructor on all elements
-    renderer.clear();
+//    renderer.clear();
     spheres.clear();
 
     //sim.clear();
