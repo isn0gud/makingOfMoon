@@ -1,6 +1,6 @@
 
 #include "common.hpp"
-
+#include "WindowManager.hpp"
 
 using namespace std;
 using namespace glm;
@@ -11,10 +11,12 @@ using namespace glm;
 
 int main(int argc, char **argv)
 {
-    GLenum error = glewInit();
-    if (error != GLEW_OK) {
-        throw std::runtime_error("Can't load GL");
-    }
+
+    // Open window
+    WindowManager* wm = WindowManager::getInstance();
+    string windowTitle = "AGP Project - The Making of the Moon";
+    wm->open(WINDOW_WIDTH, WINDOW_HEIGHT, windowTitle, true);
+
     return 0;
 }
 

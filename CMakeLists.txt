@@ -31,6 +31,9 @@ project(makingOfMoon)
 set(SOURCE_FILES
         src/common.hpp
         src/main.cpp
+        src/WindowManager.hpp
+        src/WindowManager.cpp
+
         )
 
 add_executable(makingOfMoon ${SOURCE_FILES})
