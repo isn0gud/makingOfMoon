@@ -29,13 +29,20 @@ project(makingOfMoon)
 
 
 set(SOURCE_FILES
-        src/simulations/RndTestSim.hpp
-        src/simulations/RndTestSim.cpp
+        src/simulations/testSim/RndTestSim.hpp
+        src/simulations/testSim/RndTestSim.cpp
+        src/simulations/gravitySim/GravitySim.hpp
+        src/simulations/gravitySim/GravitySim.cpp
+        src/simulations/gravitySim/PlanetBuilder.hpp
+        src/simulations/gravitySim/PlanetBuilder.cpp
+
         src/renderer/spritesRenderer/CameraRotateCenter.hpp
         src/renderer/spritesRenderer/CameraRotateCenter.cpp
         src/renderer/spritesRenderer/ParticleRenderer.hpp
         src/renderer/spritesRenderer/ParticleRenderer.cpp
         src/common.hpp
+        src/Timer.cpp
+        src/Timer.hpp
         src/ShaderProgram.hpp
         src/ShaderProgram.cpp
         src/Particles.hpp

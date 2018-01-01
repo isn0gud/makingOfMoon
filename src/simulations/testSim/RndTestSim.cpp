@@ -52,8 +52,9 @@ void RndTestSim::updateStep(int numTimeSteps) {
 void RndTestSim::initParticles(Particles *p) {
     particles = p;
 
-    for (size_t i = 0; i < particles->numParticles; ++i) {
-        particles->particlePos[i] = randomParticlePos();
-        particles->particleVelo[i] = randomParticleVel(particles->particlePos[i]);
-    }
+    PlanetBuilder::buildPlanet(p,
+                               Particles::TYPE::IRON, 1220.f * 0.25f,
+                               Particles::TYPE::SILICATE, 6371.f * 0.25f,
+            //glm::vec3(0), glm::vec3(0), glm::vec3(0, 7.2921159e-5, 0),
+                               glm::vec3(0), glm::vec3(0), glm::vec3(0, 0, 0));
 }

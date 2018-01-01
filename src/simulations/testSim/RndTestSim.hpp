@@ -1,9 +1,10 @@
 #pragma once
 
-#include "../common.hpp"
-#include "../Particles.hpp"
-#include "../ParticleSimI.hpp"
+#include "../../common.hpp"
+#include "../../Particles.hpp"
+#include "../../ParticleSimI.hpp"
 #include <vector>
+#include "../gravitySim/PlanetBuilder.hpp"
 
 glm::vec4 randomParticlePos();
 

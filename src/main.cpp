@@ -3,24 +3,23 @@
 #include "WindowInputHandler.hpp"
 #include "renderer/spritesRenderer/ParticleRenderer.hpp"
 #include "renderer/spritesRenderer/InputHandler.hpp"
+#include "Timer.hpp"
 
 #include <thread>
 
-#include "simulations/RndTestSim.hpp"
+//#include "simulations/testSim/RndTestSim.hpp"
+#include "simulations/gravitySim/GravitySim.hpp"
 
 #define MAX_FRAME_TIME 0.1f
 
 using namespace std;
 
-static void errorCallbackFunction(int error, const char *description) {
-    cerr << "GLFW-Error: " << description << endl;
-}
-
 int main(int argc, char **argv) {
 
     int WINDOW_WIDTH = 800;
     int WINDOW_HEIGHT = 600;
-    int NUM_PARTICLES = 50 * 256;     ///< Number of particles simulated
+//    int NUM_PARTICLES = 50 * 256;     ///< Number of particles simulated
+    int NUM_PARTICLES = 500;
 
     // Open window
     WindowManager *wm = WindowManager::getInstance();
@@ -55,13 +54,18 @@ int main(int argc, char **argv) {
 
     Particles *particles = renderer.allocateParticles(NUM_PARTICLES);
 
-    RndTestSim sim;
+    GravitySim sim;
     sim.initParticles(particles);
 
 
+    Timer timer;
+    timer.start();
+
     // Main loop
     while (!wm->shouldClose()) {
-        double frame_start = glfwGetTime();
+        float frameTime = timer.getFrameTime();
+        if (frameTime > MAX_FRAME_TIME)
+            frameTime = MAX_FRAME_TIME;
 
         camera.applyInput();
 
@@ -72,14 +76,8 @@ int main(int argc, char **argv) {
         wm->swapBuffers();
         // Window refresh
 
-        // Thread sleep to match min frame time
-        double frame_end = glfwGetTime();
-        double elapsed = frame_end - frame_start;
-        float frameTime = 1.0f / 60.0f; // 60 fps
-        if (elapsed < frameTime) {
-            this_thread::sleep_for(chrono::nanoseconds(
-                    (long int) ((frameTime - elapsed) * 1000000000)));
-        }
+        wm->setTitle(windowTitle + " @" + to_string(1 / frameTime) + " fps");
+
     }
     renderer.destroy();
     wm->close();
