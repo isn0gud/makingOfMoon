@@ -9,42 +9,42 @@ static void errorCallbackFunction(int error, const char *description) {
 
 static void keyCallbackFunction(GLFWwindow *window, int key, int scancode, int action, int mods) {
     WindowManager *wm = WindowManager::getInstance();
-    for (int i = 0; i < wm->keyEventListeners.size(); i++)
-        wm->keyEventListeners[i]->onKeyEvent(key, scancode, action, mods);
+    for (auto &keyEventListener : wm->keyEventListeners)
+        keyEventListener->onKeyEvent(key, scancode, action, mods);
 }
 
 static void windowCallbackFunction(GLFWwindow *window, int width, int height) {
     WindowManager *wm = WindowManager::getInstance();
-    for (int i = 0; i < wm->windowEventListeners.size(); i++)
-        wm->windowEventListeners[i]->onWindowSizeChanged(width, height);
+    for (auto &windowEventListener : wm->windowEventListeners)
+        windowEventListener->onWindowSizeChanged(width, height);
 }
 
 static void mouseButtonCallbackFunction(GLFWwindow *window, int button, int action, int mods) {
     WindowManager *wm = WindowManager::getInstance();
-    for (int i = 0; i < wm->mouseButtonEventListeners.size(); i++)
-        wm->mouseButtonEventListeners[i]->onMouseButtonEvent(button, action, mods);
+    for (auto &mouseButtonEventListener : wm->mouseButtonEventListeners)
+        mouseButtonEventListener->onMouseButtonEvent(button, action, mods);
 }
 
 static void cursorPositionCallbackFunction(GLFWwindow *window, double xpos, double ypos) {
     WindowManager *wm = WindowManager::getInstance();
-    for (int i = 0; i < wm->cursorPositionListeners.size(); i++)
-        wm->cursorPositionListeners[i]->onCursorPositionChanged(xpos, ypos);
+    for (auto &cursorPositionListener : wm->cursorPositionListeners)
+        cursorPositionListener->onCursorPositionChanged(xpos, ypos);
 
 }
 
 static void scrollCallbackFunction(GLFWwindow *window, double xScrollOffset, double yScrollOffest) {
-    return;
-    //TODO
-
+    WindowManager *wm = WindowManager::getInstance();
+    for (auto &scrollListener : wm->scrollListeners)
+        scrollListener->onScrollChanged(xScrollOffset, yScrollOffest);
 }
 
 WindowManager::WindowManager() {
     width = 0;
     height = 0;
-    window = NULL;
+    window = nullptr;
 }
 
-WindowManager *WindowManager::instance = 0;
+WindowManager *WindowManager::instance = nullptr;
 
 WindowManager *WindowManager::getInstance() {
     if (!instance)
@@ -52,23 +52,35 @@ WindowManager *WindowManager::getInstance() {
     return instance;
 }
 
-bool WindowManager::open(int width, int height, string title, bool vsync) {
+void WindowManager::open(int width, int height, string title, bool vsync) {
     glfwSetErrorCallback(errorCallbackFunction);
-    if (!glfwInit()) return -1;
+    if (!glfwInit()) throw std::runtime_error("glfw init failed");
 
     this->width = width;
     this->height = height;
 
+//    //TODO why this?
+//    GLFWmonitor *monitor = glfwGetPrimaryMonitor();
+//
+//    const GLFWvidmode *mode = glfwGetVideoMode(monitor);
+//
+//    glfwWindowHint(GLFW_RED_BITS, mode->redBits);
+//    glfwWindowHint(GLFW_GREEN_BITS, mode->greenBits);
+//    glfwWindowHint(GLFW_BLUE_BITS, mode->blueBits);
+//    glfwWindowHint(GLFW_REFRESH_RATE, mode->refreshRate);
+//    glfwWindowHint(GLFW_RESIZABLE, GLFW_FALSE);
+//    //TODO
 
-    glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
-    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 2);
-    glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
+    glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
+    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 5);
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
-    window = glfwCreateWindow(width, height, title.c_str(), NULL, NULL);
+
+    window = glfwCreateWindow(width, height, title.c_str(), nullptr, nullptr);
     if (!window) {
         glfwTerminate();
-        return true;
+        throw std::runtime_error("Can't open glfw window");
     }
+    glfwMakeContextCurrent(window);
 
     glfwSetKeyCallback(window, keyCallbackFunction);
     glfwSetWindowSizeCallback(window, windowCallbackFunction);
@@ -78,17 +90,10 @@ bool WindowManager::open(int width, int height, string title, bool vsync) {
     glfwSetScrollCallback(window, scrollCallbackFunction);
 
 
-    glfwMakeContextCurrent(window);
-
     GLenum error = glewInit();
     if (error != GLEW_OK) {
         throw std::runtime_error("Can't load GL");
     }
-//    gladLoadGLLoader((GLADloadproc) glfwGetProcAddress);
-    if (vsync)
-        glfwSwapInterval(1);
-
-    return false;
 }
 
 void WindowManager::signalShouldClose() {
@@ -98,7 +103,7 @@ void WindowManager::signalShouldClose() {
 void WindowManager::close() {
     glfwDestroyWindow(window);
     glfwTerminate();
-    window = NULL;
+    window = nullptr;
 }
 
 void WindowManager::swapBuffers() {
@@ -154,6 +159,20 @@ void WindowManager::removeCursorPositionListener(CursorPositionListener *listene
     }
 }
 
+
+void WindowManager::addScrollListener(ScrollListener *listener) {
+    scrollListeners.push_back(listener);
+}
+
+void WindowManager::removeScrollListener(ScrollListener *listener) {
+    for (int i = 0; i < scrollListeners.size(); i++) {
+        if (listener == scrollListeners[i])
+            scrollListeners.erase(scrollListeners.begin() + i);
+        break;
+    }
+}
+
+
 int WindowManager::getWidth() {
     return width;
 }
@@ -163,7 +182,7 @@ int WindowManager::getHeight() {
 }
 
 bool WindowManager::isOpen() {
-    return (window != NULL);
+    return (window != nullptr);
 }
 
 bool WindowManager::shouldClose() {
@@ -181,3 +200,5 @@ void WindowManager::disableCursor() {
 void WindowManager::enableCursor() {
     glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
 }
+
+

@@ -29,11 +29,25 @@ project(makingOfMoon)
 
 
 set(SOURCE_FILES
+        src/simulations/RndTestSim.hpp
+        src/simulations/RndTestSim.cpp
+        src/renderer/spritesRenderer/CameraRotateCenter.hpp
+        src/renderer/spritesRenderer/CameraRotateCenter.cpp
+        src/renderer/spritesRenderer/ParticleRenderer.hpp
+        src/renderer/spritesRenderer/ParticleRenderer.cpp
         src/common.hpp
-        src/main.cpp
+        src/ShaderProgram.hpp
+        src/ShaderProgram.cpp
+        src/Particles.hpp
         src/WindowManager.hpp
         src/WindowManager.cpp
-
+        src/renderer/spritesRenderer/InputHandler.hpp
+        src/renderer/spritesRenderer/InputHandler.cpp
+        src/ParticleSimI.hpp
+        src/RendererCPU.hpp
+        src/Camera.hpp
+        src/WindowInputHandler.hpp
+        src/main.cpp
         )
 
 add_executable(makingOfMoon ${SOURCE_FILES})
