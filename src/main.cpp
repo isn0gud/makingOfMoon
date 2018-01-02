@@ -1,29 +1,40 @@
 #include <iostream>
 
 #include "WindowInputHandler.hpp"
-#include "renderer/spritesRenderer/ParticleRenderer.hpp"
+#include "renderer/spritesRenderer/ParticleRenderer.cuh"
 #include "renderer/spritesRenderer/InputHandler.hpp"
 #include "Timer.hpp"
 
 #include <thread>
 
-//#include "simulations/testSim/RndTestSim.hpp"
-#include "simulations/gravitySim/GravitySim.hpp"
+#include "simulations/testSim/RndTestSimCPU.hpp"
+#include "simulations/testSim/RndTestSimGPU.cuh"
+
+#include "simulations/gravitySim/GravitySimCPU.hpp"
+//#include "simulations/gravitySim/GravitySimCPU.hpp"
 
 #define MAX_FRAME_TIME 0.1f
 
-using namespace std;
+//
+void displayOpenGLInfo() {
+    // Display information about the GPU and OpenGL version
+    printf("OpenGL %s\n", glewGetString(GLEW_VERSION));
+    printf("Vendor: %s\n", glGetString(GL_VENDOR));
+    printf("Renderer: %s\n", glGetString(GL_RENDERER));
+    printf("Version: %s\n", glGetString(GL_VERSION));
+    printf("GLSL: %s\n", glGetString(GL_SHADING_LANGUAGE_VERSION));
+}
 
 int main(int argc, char **argv) {
 
     int WINDOW_WIDTH = 800;
     int WINDOW_HEIGHT = 600;
 //    int NUM_PARTICLES = 50 * 256;     ///< Number of particles simulated
-    int NUM_PARTICLES = 500;
+    int NUM_PARTICLES = 5000;
 
     // Open window
     WindowManager *wm = WindowManager::getInstance();
-    string windowTitle = "AGP Project - The Making of the Moon";
+    std::string windowTitle = "AGP Project - The Making of the Moon";
     wm->open(WINDOW_WIDTH, WINDOW_HEIGHT, windowTitle, true);
 
 //    GLFWmonitor *monitor = glfwGetPrimaryMonitor();
@@ -51,12 +62,30 @@ int main(int argc, char **argv) {
 
     //TODO change to constructor?
     renderer.init();
+    Particles *particles = new Particles(NUM_PARTICLES);
 
-    Particles *particles = renderer.allocateParticles(NUM_PARTICLES);
+    PlanetBuilder::buildPlanet(particles,
+                               Particles::TYPE::IRON, 1220.f * 0.25f,
+                               Particles::TYPE::SILICATE, 6371.f * 0.25f,
+            //glm::vec3(0), glm::vec3(0), glm::vec3(0, 7.2921159e-5, 0),
+                               glm::vec3(0), glm::vec3(0), glm::vec3(0, 0, 0));
 
-    GravitySim sim;
-    sim.initParticles(particles);
 
+    ///CPU GRAVITY
+    particles->setParticlePos(renderer.allocateParticlesAndInit_cpu(NUM_PARTICLES, particles->pos));
+    GravitySimCPU sim(particles);
+    ///\CPU
+
+//    ///CPU
+//    particles->setParticlePos(renderer.allocateParticlesAndInit_cpu(NUM_PARTICLES, particles->pos));
+//    RndTestSimCPU sim(particles);
+//    ///\CPU
+
+//    ///GPU
+//    RndTestSimGPU sim(particles, renderer.allocateParticlesAndInit_gpu(NUM_PARTICLES, particles->pos));
+//    ///\GPU
+
+    displayOpenGLInfo();
 
     Timer timer;
     timer.start();
@@ -74,9 +103,8 @@ int main(int argc, char **argv) {
         renderer.render();
 
         wm->swapBuffers();
-        // Window refresh
 
-        wm->setTitle(windowTitle + " @" + to_string(1 / frameTime) + " fps");
+        wm->setTitle(windowTitle + " @" + std::to_string(1 / frameTime) + " fps");
 
     }
     renderer.destroy();

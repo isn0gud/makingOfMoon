@@ -5,6 +5,13 @@ We copy/take inspiration from the cuda toolkit nbody example. This can be found 
 Furthermore we give the same courtesy to "https://github.com/PLeLuron/nbody"
 
 #Build
+##CUDA
+Cuda-9 only works with gcc/g++ 6 so CMAKE_C_COMPILER and CMAKE_CXX_COMPILER has to be set, 
+as well as CUDACXX to you nvcc installation.
+
+If gcc is used, you might need to set the correct compiler:
+sudo ln -s /usr/bin/gcc-6 /usr/local/cuda/bin/gcc
+sudo ln -s /usr/bin/g++-6 /usr/local/cuda/bin/g++
 
 ###glm
 install glm with the package manager of the distribution you use

@@ -1,8 +1,8 @@
 #pragma once
 
-#include "../../ParticleSimI.hpp"
+#include "../../ParticleSim_I.hpp"
 
-class GravitySim : public ParticleSimI {
+class GravitySimCPU : public ParticleSim_I {
 private:
     Particles *particles = nullptr;
     std::vector<glm::vec3> forces;
@@ -10,14 +10,11 @@ private:
 //    glm::vec3 getVelocityFromRotation(glm::vec3 angularVelocity, glm::vec3 position, glm::vec3 centerOfRotation);
 
 public:
-    void initParticles(Particles *particles) override;
-
-
-//    const std::vector<Particle *>& getParticles() override;
+    GravitySimCPU(Particles *particles);
 
     void updateStep(int numTimeSteps) override;
 
-    virtual ~GravitySim();
+    virtual ~GravitySimCPU();
 };
 
 

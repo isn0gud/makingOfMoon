@@ -1,5 +1,5 @@
-#include "GravitySim.hpp"
-#include "PlanetBuilder.hpp"
+#include "GravitySimCPU.hpp"
+#include "../PlanetBuilder.hpp"
 #include <cmath>
 
 #define timeStep 10.0f
@@ -11,7 +11,7 @@
 const float G = 6.674E-20;
 const float distanceEpsilon = 47.0975;
 
-void GravitySim::updateStep(int numTimeSteps) {
+void GravitySimCPU::updateStep(int numTimeSteps) {
     for (int step = 0; step < numTimeSteps; step++) {
         if (forces.size() != particles->numParticles)
             forces.resize(particles->numParticles);
@@ -23,7 +23,7 @@ void GravitySim::updateStep(int numTimeSteps) {
         for (int i = 0; i < particles->numParticles; i++) {
             for (int j = i + 1; j < particles->numParticles; j++) {
                 glm::vec3 force(0, 0, 0);
-                glm::vec3 difference = particles->particlePos[i] - particles->particlePos[j];
+                glm::vec3 difference = particles->pos[i] - particles->pos[j];
 
                 float distance = glm::length(difference);
                 glm::vec3 differenceNormal = (difference / distance);
@@ -45,7 +45,7 @@ void GravitySim::updateStep(int numTimeSteps) {
                     float elasticConstantParticle2 = particles->elasticSpringConstant[j];
 
                     // If the separation increases, i.e. the separation velocity is positive
-                    if (dot(differenceNormal, glm::vec3(particles->particleVelo[i] - particles->particleVelo[j])) > 0) {
+                    if (dot(differenceNormal, glm::vec3(particles->velo[i] - particles->velo[j])) > 0) {
                         // Check if the force shall be reduced due to plastic deformation
                         if (distance < particles->radius[i] * particles->shellDepthFraction[i] +
                                        particles->radius[j] * particles->shellDepthFraction[j]) {
@@ -80,17 +80,17 @@ void GravitySim::updateStep(int numTimeSteps) {
         // Leapfrog integration (better than Euler for gravity simulations)
         for (int i = 0; i < forces.size(); i++) {
             glm::vec4 newAcceleration = glm::vec4(forces[i] / particles->mass[i], 1); // a_i+1 = F_i+1 / m
-            particles->particlePos[i] += particles->particleVelo[i] * timeStep +
-                                         particles->particleAccel[i] * 0.5 * timeStep *
-                                         timeStep; // x_i+1 = v_i*dt + a_i*dt^2/2
-            particles->particleVelo[i] +=
-                    (particles->particleAccel[i] + newAcceleration) * 0.5 * timeStep; // v_i+1 = v_i + (a_i + a_i+1)dt/2
-            particles->particleAccel[i] = newAcceleration;
+            particles->pos[i] += particles->velo[i] * timeStep +
+                                 particles->accel[i] * 0.5f * timeStep *
+                                 timeStep; // x_i+1 = v_i*dt + a_i*dt^2/2
+            particles->velo[i] +=
+                    (particles->accel[i] + newAcceleration) * 0.5f * timeStep; // v_i+1 = v_i + (a_i + a_i+1)dt/2
+            particles->accel[i] = newAcceleration;
         }
     }
 }
 
-//GravitySim::GravitySim() {
+//GravitySimCPU::GravitySimCPU() {
 //
 //
 //
@@ -136,19 +136,9 @@ void GravitySim::updateStep(int numTimeSteps) {
 //}
 
 
-GravitySim::~GravitySim() {
+GravitySimCPU::~GravitySimCPU() {
     // deletes all particles
     particles->clear();
 }
 
-void GravitySim::initParticles(Particles *p) {
-
-    particles = p;
-
-    PlanetBuilder::buildPlanet(p,
-                               Particles::TYPE::IRON, 1220.f * 0.25f,
-                               Particles::TYPE::SILICATE, 6371.f * 0.25f,
-            //glm::vec3(0), glm::vec3(0), glm::vec3(0, 7.2921159e-5, 0),
-                               glm::vec3(0), glm::vec3(0), glm::vec3(0, 0, 0));
-}
-
+GravitySimCPU::GravitySimCPU(Particles *particles) : particles(particles) {}

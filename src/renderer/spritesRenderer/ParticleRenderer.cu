@@ -1,10 +1,11 @@
-#include "ParticleRenderer.hpp"
+#include "ParticleRenderer.cuh"
 
 #include <algorithm>
+#include <glm/gtc/type_ptr.hpp>
+#include <cuda_gl_interop.h>
+
 
 const int FBO_MARGIN = 50;
-
-using namespace std;
 
 
 void ParticleRenderer::init() {
@@ -161,7 +162,6 @@ void ParticleRenderer::setUniforms() {
 
 
 void ParticleRenderer::render() {
-
     // Particle HDR rendering
     glViewport(0, 0, camera->getWindowWidth() + 2 * FBO_MARGIN, camera->getWindowHeight() + 2 * FBO_MARGIN);
     glBindVertexArray(vaoParticles);
@@ -221,15 +221,15 @@ void ParticleRenderer::render() {
     glDrawArrays(GL_TRIANGLES, 0, 3);
 }
 
-ParticleRenderer::ParticleRenderer(Camera *camera) : camera(camera) {}
+ParticleRenderer::ParticleRenderer(Camera_I *camera) : camera(camera) {}
 
 void ParticleRenderer::destroy() {
 
 }
 
-Particles *ParticleRenderer::allocateParticles(int numParticles) {
+glm::vec4 *ParticleRenderer::allocateParticlesAndInit_cpu(int numParticles, glm::vec4 *particlesPos) {
     // SSBO allocation & data upload
-    glNamedBufferStorage(vboParticlesPos, numParticles * sizeof(glm::vec4), nullptr,
+    glNamedBufferStorage(vboParticlesPos, numParticles * sizeof(glm::vec4), particlesPos,
                          GL_MAP_WRITE_BIT | GL_MAP_READ_BIT | GL_MAP_PERSISTENT_BIT |
                          GL_MAP_COHERENT_BIT); // Buffer storage is fixed size compared to BuferData
     //Mapping gpu memory to cpu memory for easy writes.
@@ -246,11 +246,21 @@ Particles *ParticleRenderer::allocateParticles(int numParticles) {
         fprintf(stderr, "Buffer map failed! %d (%s)\n", error, glewGetErrorString(error)); //gluErrorString(error));
         return nullptr;
     } else {
-        Particles *particles = new Particles(numParticles);
-        particles->particlePos = particlePosPointer;
-        return particles;
+        return particlePosPointer;
     }
+
 }
 
+cudaGraphicsResource_t ParticleRenderer::allocateParticlesAndInit_gpu(int numParticles, glm::vec4 *particlesPos) {
+    // SSBO allocation & data upload
+    glNamedBufferStorage(vboParticlesPos, numParticles * sizeof(glm::vec4), particlesPos,
+                         GL_MAP_WRITE_BIT | GL_MAP_READ_BIT | GL_MAP_PERSISTENT_BIT |
+                         GL_MAP_COHERENT_BIT); // Buffer storage is fixed size compared to BuferData
+    this->numParticles = static_cast<size_t>(numParticles);
 
-
+    cudaGraphicsResource_t vboParticlesPos_cuda;
+    cudaGraphicsGLRegisterBuffer(&vboParticlesPos_cuda,
+                                 vboParticlesPos,
+                                 cudaGraphicsRegisterFlagsNone);
+    return vboParticlesPos_cuda;
+}

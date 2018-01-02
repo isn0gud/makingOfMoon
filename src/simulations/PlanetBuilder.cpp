@@ -37,8 +37,8 @@ void PlanetBuilder::buildPlanet(Particles *particles, Particles::TYPE coreType, 
             particles->setParticleType(i, outerLayerType, particleRadius);
         }
 
-        particles->particlePos[i] = glm::vec4(position + offsetFromCenterOfPlanet, 1);
-        particles->particleVelo[i] = glm::vec4(velocity + glm::cross(angularVelocity, offsetFromCenterOfPlanet), 1);
+        particles->pos[i] = glm::vec4(position + offsetFromCenterOfPlanet, 1);
+        particles->velo[i] = glm::vec4(velocity + glm::cross(angularVelocity, offsetFromCenterOfPlanet), 1);
     }
 }
 
@@ -50,7 +50,7 @@ glm::vec3 PlanetBuilder::sampleRandomPointInSphericalShell(float innerRadius, fl
                        * randomFloatFromZeroToOne(),
                        1.f / 3.f);
     float mu = 1 - 2 * randomFloatFromZeroToOne();
-    float planarLength = sqrt(1 - mu * mu);
+    float planarLength = std::sqrt(1 - mu * mu);
     float azimuth = 2 * PI * randomFloatFromZeroToOne();
     return glm::vec3(radius * planarLength * (float) cos(azimuth), radius * planarLength * (float) sin(azimuth),
                      radius * mu);

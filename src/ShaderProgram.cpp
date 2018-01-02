@@ -3,27 +3,25 @@
 #include <sstream>
 #include <fstream>
 
-using namespace std;
-
 ShaderProgram::ShaderProgram() : id(0) {}
 
-void ShaderProgram::source(GLenum shader_type, const string &filename) { // loadShaders
+void ShaderProgram::source(GLenum shader_type, const std::string &filename) { // loadShaders
     if (!id) id = glCreateProgram();
 
-    string code;
+    std::string code;
 
     // IO stuff
     try {
-        stringstream sstream;
+        std::stringstream sstream;
         {
-            ifstream stream;
-            stream.exceptions(ifstream::failbit | ifstream::badbit);
+            std::ifstream stream;
+            stream.exceptions(std::ifstream::failbit | std::ifstream::badbit);
             stream.open(filename);
             sstream << stream.rdbuf();
         }
         code = sstream.str();
     }
-    catch (ifstream::failure &e) {
+    catch (std::ifstream::failure &e) {
         throw std::runtime_error(std::string("Can't open ") + filename + std::string(e.what()));
     }
 

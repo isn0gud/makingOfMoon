@@ -1,9 +1,9 @@
 #pragma once
 
 #include "../../common.hpp"
-#include "../../Camera.hpp"
+#include "../../Camera_I.hpp"
 
-class CameraRotateCenter : public Camera {
+class CameraRotateCenter : public Camera_I {
 
 public:
     int getWindowWidth() override;

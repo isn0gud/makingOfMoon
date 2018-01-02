@@ -3,11 +3,10 @@
 #include "Particles.hpp"
 #include "common.hpp"
 
-class ParticleSimI {
+class ParticleSim_I {
 
 public:
 
-    virtual void initParticles(Particles *particles)=0;
 
     virtual void updateStep(int numTimeSteps)=0;
 };

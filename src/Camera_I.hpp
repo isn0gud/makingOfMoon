@@ -3,7 +3,7 @@
 #include "common.hpp"
 #include "WindowManager.hpp"
 
-class Camera : public WindowEventListener {
+class Camera_I : public WindowEventListener {
 public:
     virtual int getWindowWidth() = 0;
 

@@ -9,9 +9,9 @@ class Particles {
 public:
     explicit Particles(int numParticles) : numParticles(numParticles) {
         type = new TYPE[numParticles];
-        particlePos = new glm::vec4[numParticles];
-        particleVelo = new glm::vec4[numParticles];
-        particleAccel = new glm::vec4[numParticles];
+        pos = new glm::vec4[numParticles];
+        velo = new glm::vec4[numParticles];
+        accel = new glm::vec4[numParticles];
         radius = new GLfloat[numParticles];
         mass = new GLfloat[numParticles];
         shellDepthFraction = new GLfloat[numParticles];
@@ -32,11 +32,11 @@ public:
     /// can't use a std::vector, since the gl buffer mapping to cpu space gives an allocated pointer already,
     /// which has to be used.
     //unit: km
-    glm::vec4 *particlePos = nullptr;
+    glm::vec4 *pos = nullptr;
     //unit: km/s
-    glm::vec4 *particleVelo = nullptr;
+    glm::vec4 *velo = nullptr;
     //unit: km/s^2
-    glm::vec4 *particleAccel = nullptr;
+    glm::vec4 *accel = nullptr;
     GLfloat *radius = nullptr;
 
     //unit: kg
@@ -71,11 +71,16 @@ public:
         }
     }
 
+    void setParticlePos(glm::vec4 *particlesPos) {
+        delete[](pos);
+        pos = particlesPos;
+    }
+
     void clear() {
         delete[] type;
-        delete[] particlePos;
-        delete[] particleVelo;
-        delete[] particleAccel;
+        delete[] pos;
+        delete[] velo;
+        delete[] accel;
         delete[] radius;
         delete[] shellDepthFraction;
         delete[] elasticSpringConstant;

@@ -1,10 +1,8 @@
 #include "WindowManager.hpp"
 #include <iostream>
 
-using namespace std;
-
 static void errorCallbackFunction(int error, const char *description) {
-    cerr << "GLFW-Error: " << description << endl;
+    std::cerr << "GLFW-Error: " << description << std::endl;
 }
 
 static void keyCallbackFunction(GLFWwindow *window, int key, int scancode, int action, int mods) {
@@ -52,7 +50,7 @@ WindowManager *WindowManager::getInstance() {
     return instance;
 }
 
-void WindowManager::open(int width, int height, string title, bool vsync) {
+void WindowManager::open(int width, int height, std::string title, bool vsync) {
     glfwSetErrorCallback(errorCallbackFunction);
     if (!glfwInit()) throw std::runtime_error("glfw init failed");
 
@@ -189,7 +187,7 @@ bool WindowManager::shouldClose() {
     return (bool) glfwWindowShouldClose(window);
 }
 
-void WindowManager::setTitle(string title) {
+void WindowManager::setTitle(std::string title) {
     glfwSetWindowTitle(window, title.c_str());
 }
 

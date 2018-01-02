@@ -2,8 +2,6 @@
 
 #include "common.hpp"
 
-using namespace std;
-
 static void keyCallbackFunction(GLFWwindow *window, int key, int scancode, int action, int mods);
 
 static void windowCallbackFunction(GLFWwindow *window, int width, int height);
@@ -53,11 +51,11 @@ private:
     int width;
     int height;
     GLFWwindow *window;
-    vector<KeyEventListener *> keyEventListeners;
-    vector<WindowEventListener *> windowEventListeners;
-    vector<MouseButtonEventListener *> mouseButtonEventListeners;
-    vector<CursorPositionListener *> cursorPositionListeners;
-    vector<ScrollListener *> scrollListeners;
+    std::vector<KeyEventListener *> keyEventListeners;
+    std::vector<WindowEventListener *> windowEventListeners;
+    std::vector<MouseButtonEventListener *> mouseButtonEventListeners;
+    std::vector<CursorPositionListener *> cursorPositionListeners;
+    std::vector<ScrollListener *> scrollListeners;
 
     friend void keyCallbackFunction(GLFWwindow *window, int key, int scancode, int action, int mods);
 
@@ -72,7 +70,7 @@ private:
 public:
     static WindowManager *getInstance();
 
-    void open(int width, int height, string title, bool vsync);
+    void open(int width, int height, std::string title, bool vsync);
 
     void signalShouldClose();
 
@@ -86,7 +84,7 @@ public:
 
     int getHeight();
 
-    void setTitle(string title);
+    void setTitle(std::string title);
 
     void swapBuffers();
 

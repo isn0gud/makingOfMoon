@@ -1,7 +1,7 @@
 #pragma once
 
-#include "../../common.hpp"
-#include "../../Particles.hpp"
+#include "../common.hpp"
+#include "../Particles.hpp"
 
 class PlanetBuilder {
 private:

@@ -4,18 +4,25 @@
 
 
 #include <vector>
+#include <driver_types.h>
 
-#include "../../RendererCPU.hpp"
+#include "../../Renderer_I.hpp"
 #include "../../ShaderProgram.hpp"
+#include "../../Camera_I.hpp"
 
-class ParticleRenderer : public RendererCPU {
+class ParticleRenderer : public Renderer_I {
 
 public:
     void init() override;
 
-    explicit ParticleRenderer(Camera *camera);
+    explicit ParticleRenderer(Camera_I *camera);
 
-    Particles *allocateParticles(int numParticles) override;
+//    Particles *allocateParticles(int numParticles) override;
+
+    glm::vec4 *allocateParticlesAndInit_cpu(int numParticles, glm::vec4 *particlesPos) override;
+
+    cudaGraphicsResource_t allocateParticlesAndInit_gpu(int numParticles, glm::vec4 *particlesPos) override;
+
 
     void render() override;
 
@@ -58,6 +65,6 @@ private:
     int blurDownscale{};         ///< Downscale factor for the blurring step
 
     size_t numParticles{};
-    Camera *camera;
+    Camera_I *camera;
 
 };

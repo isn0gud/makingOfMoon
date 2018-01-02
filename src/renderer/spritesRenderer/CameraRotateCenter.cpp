@@ -2,8 +2,6 @@
 
 const float PI = 3.14159265358979323846f;
 
-using namespace std;
-
 
 CameraRotateCenter::CameraRotateCenter(int windowWidth, int windowHeight) :
         windowWidth(windowWidth),
@@ -25,7 +23,7 @@ void CameraRotateCenter::applyInput() {
     // limits
     if (position.x < 0) position.x += 2 * PI;
     if (position.x >= 2 * PI) position.x -= 2 * PI;
-    position.y = max(-PI / 2 + 0.001f, min(position.y, PI / 2 - 0.001f));
+    position.y = std::max(-PI / 2 + 0.001f, std::min(position.y, PI / 2 - 0.001f));
 }
 
 glm::mat4 CameraRotateCenter::getProj() {
