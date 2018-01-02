@@ -2,7 +2,7 @@
 #include <cuda_gl_interop.h>
 #include <cuda_runtime_api.h>
 #include <device_launch_parameters.h>
-#include "../../cudaUtil.cuh"
+#include "../../util/helper_cuda.h"
 
 __global__ void update(glm::vec4 *pPos) {
     int i = blockIdx.x * blockDim.x + threadIdx.x;
@@ -19,9 +19,9 @@ void RndTestSimGPU::updateStep(int numTimeSteps) {
     size_t size = particles->numParticles * sizeof(glm::vec4);
     glm::vec4 *d_particles;
 
-    gpuErrchk(cudaGraphicsMapResources(1, &vboParticlesPos_cuda));
+    checkCudaErrors(cudaGraphicsMapResources(1, &vboParticlesPos_cuda));
 
-    gpuErrchk(cudaGraphicsResourceGetMappedPointer((void **) &d_particles,
+    checkCudaErrors(cudaGraphicsResourceGetMappedPointer((void **) &d_particles,
                                                    &size, vboParticlesPos_cuda));
 
 
@@ -30,9 +30,9 @@ void RndTestSimGPU::updateStep(int numTimeSteps) {
 
 
     // Unmap the SSBO to be available to OpenGL
-    gpuErrchk(cudaGraphicsUnmapResources(1, &vboParticlesPos_cuda));
-    gpuErrchk(cudaPeekAtLastError());
-    gpuErrchk(cudaDeviceSynchronize());
+    checkCudaErrors(cudaGraphicsUnmapResources(1, &vboParticlesPos_cuda));
+    checkCudaErrors(cudaPeekAtLastError());
+    checkCudaErrors(cudaDeviceSynchronize());
 }
 
 RndTestSimGPU::RndTestSimGPU(Particles *particles, cudaGraphicsResource_t particlePos)
