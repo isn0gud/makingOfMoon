@@ -1,6 +1,4 @@
 #include "GravitySimCPU.hpp"
-#include "../PlanetBuilder.hpp"
-#include <cmath>
 
 #define timeStep 10.0f
 #define COLL_SPEED 1.5
@@ -13,9 +11,9 @@ const float distanceEpsilon = 47.0975;
 
 void GravitySimCPU::updateStep(int numTimeSteps) {
     for (int step = 0; step < numTimeSteps; step++) {
+        std::vector<glm::vec3> forces;
         if (forces.size() != particles->numParticles)
             forces.resize(particles->numParticles);
-
         for (auto &force : forces)
             force = glm::vec3(0);
 

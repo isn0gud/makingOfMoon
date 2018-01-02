@@ -11,7 +11,7 @@
 #include "simulations/testSim/RndTestSimGPU.cuh"
 
 #include "simulations/gravitySim/GravitySimCPU.hpp"
-//#include "simulations/gravitySim/GravitySimCPU.hpp"
+#include "simulations/gravitySim/GravitySimGPU.cuh"
 
 #define MAX_FRAME_TIME 0.1f
 
@@ -71,10 +71,15 @@ int main(int argc, char **argv) {
                                glm::vec3(0), glm::vec3(0), glm::vec3(0, 0, 0));
 
 
-    ///CPU GRAVITY
-    particles->setParticlePos(renderer.allocateParticlesAndInit_cpu(NUM_PARTICLES, particles->pos));
-    GravitySimCPU sim(particles);
-    ///\CPU
+//    ///CPU GRAVITY
+//    particles->setParticlePos(renderer.allocateParticlesAndInit_cpu(NUM_PARTICLES, particles->pos));
+//    GravitySimCPU sim(particles);
+//    ///\CPU
+    std::cout << "sizeof particles: " << particles->sizeInBytes() << " BYTES" << std::endl;
+    ///GPU GRAVITY
+    GravitySimGPU sim(particles, renderer.allocateParticlesAndInit_gpu(NUM_PARTICLES, particles->pos));
+    ///\GPU
+
 
 //    ///CPU
 //    particles->setParticlePos(renderer.allocateParticlesAndInit_cpu(NUM_PARTICLES, particles->pos));

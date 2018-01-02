@@ -46,12 +46,13 @@ find_package(OpenGL REQUIRED)
 find_package(CUDA REQUIRED)
 
 
-
 set(SOURCE_FILES
         src/simulations/testSim/RndTestSimCPU.hpp
         src/simulations/testSim/RndTestSimCPU.cpp
         src/simulations/gravitySim/GravitySimCPU.hpp
         src/simulations/gravitySim/GravitySimCPU.cpp
+        src/simulations/gravitySim/GravitySimGPU.cuh
+        src/simulations/gravitySim/GravitySimGPU.cu
         src/simulations/PlanetBuilder.hpp
         src/simulations/PlanetBuilder.cpp
 
@@ -63,6 +64,8 @@ set(SOURCE_FILES
 
         #        src/renderer/sphereRenderer/Renderer.hpp
         #        src/renderer/sphereRenderer/Renderer.cpp
+        src/util/helper_cuda.h
+        src/util/helper_string.h
 
         src/common.hpp
         src/Timer.cpp
