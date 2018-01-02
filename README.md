@@ -4,40 +4,48 @@ We copy/take inspiration from the cuda toolkit nbody example. This can be found 
 
 Furthermore we give the same courtesy to "https://github.com/PLeLuron/nbody"
 
-#Build
-##CUDA
-Cuda-9 only works with gcc/g++ 6 so CMAKE_C_COMPILER and CMAKE_CXX_COMPILER has to be set, 
-as well as CUDACXX to you nvcc installation.
+# Build
+
+## CUDA
+
+Cuda-9 only works with gcc/g++ 6 so `CMAKE_C_COMPILER` and `CMAKE_CXX_COMPILER` has to be set, 
+as well as `CUDACXX` to you nvcc installation.
 
 If gcc is used, you might need to set the correct compiler:
-sudo ln -s /usr/bin/gcc-6 /usr/local/cuda/bin/gcc
-sudo ln -s /usr/bin/g++-6 /usr/local/cuda/bin/g++
 
-###glm
-install glm with the package manager of the distribution you use
+    sudo ln -s /usr/bin/gcc-6 /usr/local/cuda/bin/gcc
+    sudo ln -s /usr/bin/g++-6 /usr/local/cuda/bin/g++
 
-###glfw
-install glfw with the package manager of the distribution you use
+### glm
 
-####local installation
-cd lib/glfw
-cmake .
-make install DESTDIR=glfw_compiled
+install `glm` with the package manager of the distribution you use
 
-###glew
+### glfw
+
+install `glfw` with the package manager of the distribution you use
+
+#### local installation
+
+    cd lib/glfw
+    cmake .
+    make install DESTDIR=glfw_compiled
+
+### glew
 
 install glew with the package manager of the distribution you use.
-(under ubuntu 17.10 apt installs libGLEW.so.2.0.0 to /usr/lib/x86_64-linux-gnu/.
- So you need to create a simlink manually pointing libGLEW.so -> libGLEW.so.2.0.0 )
+(under ubuntu 17.10 apt installs `libGLEW.so.2.0.0` to `/usr/lib/x86_64-linux-gnu/`.
+ So you need to create a simlink manually pointing `libGLEW.so -> libGLEW.so.2.0.0` )
 
 
-####local installation
+#### local installation
+
 Download https://github.com/nigels-com/glew/releases/download/glew-2.1.0/glew-2.1.0.zip to lib/
-cd lib/glew-2.1.0
-make install DESTDIR=glew_compiled
+
+    cd lib/glew-2.1.0
+    make install DESTDIR=glew_compiled
 
 
-#TODO
+# TODO
 
 - [x] Create a inital CPU implementation with few particles
 - [x] Render the particles as points with blur instead of spheres.
