@@ -1,4 +1,4 @@
-#include "ParticleRenderer.cuh"
+#include "ParticleSpriteRenderer.cuh"
 
 #include <algorithm>
 #include <glm/gtc/type_ptr.hpp>
@@ -8,7 +8,7 @@
 const int FBO_MARGIN = 50;
 
 
-void ParticleRenderer::init() {
+void ParticleSpriteRenderer::init() {
 
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 5);
@@ -43,7 +43,7 @@ std::vector<float> genFlareTex(int tex_size) {
     return pixels;
 }
 
-void ParticleRenderer::createFlareTexture() {
+void ParticleSpriteRenderer::createFlareTexture() {
     texSize = 16;
     glCreateTextures(GL_TEXTURE_2D, 1, &flareTex);
     glTextureStorage2D(flareTex, 1, GL_R32F, texSize, texSize);
@@ -55,7 +55,7 @@ void ParticleRenderer::createFlareTexture() {
     }
 }
 
-void ParticleRenderer::createVaosVbos() {
+void ParticleSpriteRenderer::createVaosVbos() {
     // Particle VAO
     glCreateVertexArrays(1, &vaoParticles);
     glCreateBuffers(1, &vboParticlesPos);
@@ -91,7 +91,7 @@ void ParticleRenderer::createVaosVbos() {
 }
 
 
-void ParticleRenderer::initShaders() {
+void ParticleSpriteRenderer::initShaders() {
     programHdr.source(GL_VERTEX_SHADER, "shaders/main.vert");
     programHdr.source(GL_FRAGMENT_SHADER, "shaders/main.frag");
     programHdr.source(GL_GEOMETRY_SHADER, "shaders/main.geom");
@@ -110,7 +110,7 @@ void ParticleRenderer::initShaders() {
     programLum.link();
 }
 
-void ParticleRenderer::initFbos() {
+void ParticleSpriteRenderer::initFbos() {
     int blur_dsc = 2;
     blurDownscale = blur_dsc;
 
@@ -144,7 +144,7 @@ void ParticleRenderer::initFbos() {
     }
 }
 
-void ParticleRenderer::setUniforms() {
+void ParticleSpriteRenderer::setUniforms() {
     // const Uniforms
 //    glProgramUniform1f(programInteraction.getId(), 0, SIM_dt);
 //    glProgramUniform1f(programInteraction.getId(), 1, G);
@@ -161,7 +161,7 @@ void ParticleRenderer::setUniforms() {
 }
 
 
-void ParticleRenderer::render() {
+void ParticleSpriteRenderer::render() {
     // Particle HDR rendering
     glViewport(0, 0, camera->getWindowWidth() + 2 * FBO_MARGIN, camera->getWindowHeight() + 2 * FBO_MARGIN);
     glBindVertexArray(vaoParticles);
@@ -221,13 +221,13 @@ void ParticleRenderer::render() {
     glDrawArrays(GL_TRIANGLES, 0, 3);
 }
 
-ParticleRenderer::ParticleRenderer(Camera_I *camera) : camera(camera) {}
+ParticleSpriteRenderer::ParticleSpriteRenderer(Camera_I *camera) : camera(camera) {}
 
-void ParticleRenderer::destroy() {
+void ParticleSpriteRenderer::destroy() {
 
 }
 
-glm::vec4 *ParticleRenderer::allocateParticlesAndInit_cpu(int numParticles, glm::vec4 *particlesPos) {
+glm::vec4 *ParticleSpriteRenderer::allocateParticlesAndInit_cpu(int numParticles, glm::vec4 *particlesPos) {
     // SSBO allocation & data upload
     glNamedBufferStorage(vboParticlesPos, numParticles * sizeof(glm::vec4), particlesPos,
                          GL_MAP_WRITE_BIT | GL_MAP_READ_BIT | GL_MAP_PERSISTENT_BIT |
@@ -251,7 +251,7 @@ glm::vec4 *ParticleRenderer::allocateParticlesAndInit_cpu(int numParticles, glm:
 
 }
 
-cudaGraphicsResource_t ParticleRenderer::allocateParticlesAndInit_gpu(int numParticles, glm::vec4 *particlesPos) {
+cudaGraphicsResource_t ParticleSpriteRenderer::allocateParticlesAndInit_gpu(int numParticles, glm::vec4 *particlesPos) {
     // SSBO allocation & data upload
     glNamedBufferStorage(vboParticlesPos, numParticles * sizeof(glm::vec4), particlesPos,
                          GL_MAP_WRITE_BIT | GL_MAP_READ_BIT | GL_MAP_PERSISTENT_BIT |

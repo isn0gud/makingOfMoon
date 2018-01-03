@@ -1,7 +1,7 @@
 #include <iostream>
 
 #include "WindowInputHandler.hpp"
-#include "renderer/spritesRenderer/ParticleRenderer.cuh"
+#include "renderer/spritesRenderer/ParticleSpriteRenderer.cuh"
 #include "renderer/spritesRenderer/InputHandler.hpp"
 #include "Timer.hpp"
 
@@ -48,7 +48,7 @@ int main(int argc, char **argv) {
 //    glfwWindowHint(GLFW_RESIZABLE, GLFW_FALSE);
     CameraRotateCenter camera(WINDOW_WIDTH, WINDOW_HEIGHT);
     InputHandler inputHandler(&camera);
-    ParticleRenderer renderer(&camera);
+    ParticleSpriteRenderer renderer(&camera);
 
 
     WindowInputHandler windowInputHandler;

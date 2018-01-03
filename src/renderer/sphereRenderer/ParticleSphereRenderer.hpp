@@ -1,16 +1,16 @@
 #pragma once
 
+#include <driver_types.h>
 #include "../../common.hpp"
 #include "../../Renderer_I.hpp"
 #include "../spritesRenderer/CameraRotateCenter.hpp"
 #include "../../ShaderProgram.hpp"
+#include "../../Camera_I.hpp"
 
-
-//#include "Camera.hpp"
 #include "Sphere.hpp"
 #include "Model.hpp"
 
-class Renderer : public RendererCPU {
+class ParticleSphereRenderer : public Renderer_I {
 protected:
 
 
@@ -21,20 +21,30 @@ protected:
     float cameraAzimuthAngle;
     float cameraPolarAngle;
 
-    CameraRotateCenter *camera;
+    Camera_I *camera;
 
     void updateCamera(float frameTime);
 
 public:
     void init() override;
 
-    Particles *allocateParticles(int numParticles) override;
+    glm::vec4 *allocateParticlesAndInit_cpu(int numParticles, glm::vec4 *particlesPos) override;
+
+    cudaGraphicsResource_t allocateParticlesAndInit_gpu(int numParticles, glm::vec4 *particlesPos) override;
 
     void render() override;
 
     void destroy() override;
 
-    Renderer(CameraRotateCenter *camera);
+//    void init() override;
+//
+//    Particles *allocateParticles(int numParticles) override;
+//
+//    void render() override;
+//
+//    void destroy() override;
+//
+//    ParticleSphereRenderer(CameraRotateCenter *camera);
 
 //    void init(int windowWidth, int windowHeight);
 

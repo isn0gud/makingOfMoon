@@ -10,12 +10,12 @@
 #include "../../ShaderProgram.hpp"
 #include "../../Camera_I.hpp"
 
-class ParticleRenderer : public Renderer_I {
+class ParticleSpriteRenderer : public Renderer_I {
 
 public:
     void init() override;
 
-    explicit ParticleRenderer(Camera_I *camera);
+    explicit ParticleSpriteRenderer(Camera_I *camera);
 
 //    Particles *allocateParticles(int numParticles) override;
 

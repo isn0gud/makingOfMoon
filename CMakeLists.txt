@@ -58,12 +58,27 @@ set(SOURCE_FILES
 
         src/renderer/spritesRenderer/CameraRotateCenter.hpp
         src/renderer/spritesRenderer/CameraRotateCenter.cpp
-        src/renderer/spritesRenderer/ParticleRenderer.cuh
-        src/renderer/spritesRenderer/ParticleRenderer.cu
+        src/renderer/spritesRenderer/ParticleSpriteRenderer.cuh
+        src/renderer/spritesRenderer/ParticleSpriteRenderer.cu
 
 
-        #        src/renderer/sphereRenderer/Renderer.hpp
-        #        src/renderer/sphereRenderer/Renderer.cpp
+#        src/renderer/sphereRenderer/ParticleSphereRenderer.hpp
+#        src/renderer/sphereRenderer/ParticleSphereRenderer.cpp
+#        src/renderer/sphereRenderer/Camera.hpp
+#        src/renderer/sphereRenderer/Camera.cpp
+#        src/renderer/sphereRenderer/GeometryBuilder.hpp
+#        src/renderer/sphereRenderer/GeometryBuilder.cpp
+#        src/renderer/sphereRenderer/Model.hpp
+#        src/renderer/sphereRenderer/Model.cpp
+#        src/renderer/sphereRenderer/ParticleSphere.hpp
+#        src/renderer/sphereRenderer/ParticleSphere.cpp
+#        src/renderer/sphereRenderer/RendererInputHandler.hpp
+#        src/renderer/sphereRenderer/RendererInputHandler.cpp
+#        src/renderer/sphereRenderer/Sphere.hpp
+#        src/renderer/sphereRenderer/StaticSphere.hpp
+#        src/renderer/sphereRenderer/StaticSphere.cpp
+
+
         src/util/helper_cuda.h
         src/util/helper_string.h
 

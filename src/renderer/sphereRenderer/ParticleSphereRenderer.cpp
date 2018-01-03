@@ -1,4 +1,4 @@
-#include "Renderer.hpp"
+#include "ParticleSphereRenderer.hpp"
 
 #include "GeometryBuilder.hpp"
 
@@ -7,7 +7,7 @@
 #define PI 3.14159265359
 #define ANGLE_EPSILON 0.1
 
-void Renderer::init() {
+void ParticleSphereRenderer::init() {
     // Set OpenGL settings
     glClearColor(0.3f, 0.3f, 0.3f, 0.0f);
     glEnable(GL_CULL_FACE);
@@ -27,13 +27,13 @@ void Renderer::init() {
 //    camera.setOrientation(glm::vec3(0, 0, -1), glm::vec3(0, 1, 0));
 
     // Create Model
-    vector<vec3> vertices;
+    std::vector<glm::vec3> vertices;
     GeometryBuilder::buildSphere(12, 1, vertices);
-    sphereModel.loadVertexData(vertices, shaderProgramId, "aPos");
+    sphereModel.loadVertexData(vertices, shaderProgram, "aPos");
 
 }
 
-//void Renderer::updateCamera(float frameTime) {
+//void ParticleSphereRenderer::updateCamera(float frameTime) {
 //    auto inputData = inputHandler.getDerivedData();
 //    camera.position += camera.orientation * inputData.cameraLocalVelocity * CAMERA_SPEED * frameTime;
 //
@@ -52,7 +52,7 @@ void Renderer::init() {
 //    camera.setOrientation(cameraForwardVector, glm::vec3(0, 1, 0));
 //}
 
-void Renderer::render() {
+void ParticleSphereRenderer::render() {
     //const std::vector<Sphere *> &spheres, float frameTime
     // Update
     updateCamera(frameTime);
@@ -82,12 +82,17 @@ void Renderer::render() {
 }
 
 
-Particles *Renderer::allocateParticles(int numParticles) {
+
+glm::vec4 *ParticleSphereRenderer::allocateParticlesAndInit_cpu(int numParticles, glm::vec4 *particlesPos) {
     return nullptr;
 }
 
-void Renderer::destroy() {
+cudaGraphicsResource_t ParticleSphereRenderer::allocateParticlesAndInit_gpu(int numParticles, glm::vec4 *particlesPos) {
+    return nullptr;
+}
+
+void ParticleSphereRenderer::destroy() {
 
 }
 
-Renderer::Renderer(CameraRotateCenter *camera) : camera(camera) {}
+ParticleSphereRenderer::ParticleSphereRenderer(Camera_I *camera) : camera(camera) {}
