@@ -6,9 +6,9 @@
 class CameraRotateCenter : public Camera_I {
 
 public:
-    int getWindowWidth() override;
+    int getWindowWidth();
 
-    int getWindowHeight() override;
+    int getWindowHeight();
 
     CameraRotateCenter(int windowWidth, int windowHeight);
 
@@ -20,14 +20,14 @@ public:
      * @param height viewport height
      * @return projection matrix
      */
-    glm::mat4 getProj() override;
+    glm::mat4 getProj();
 
     /**
      * Computes view matrix from camera parameters
      * @param c camera parameters
      * @param view matrix
      */
-    glm::mat4 getView() override;
+    glm::mat4 getView();
 
     glm::vec3 getForward();
 
@@ -43,13 +43,7 @@ public:
 
     void onWindowSizeChanged(int width, int height) override;
 
-    /**
-     * Computes next step of camera parameters
-     * @param c camera at step n
-     * @return camera at step n+1
-     */
-    void applyInput() override;
-
+    void applyInput();
 
 private:
     int windowWidth;

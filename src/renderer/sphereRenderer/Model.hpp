@@ -4,8 +4,6 @@
 #include <vector>
 
 
-
-
 class Model {
     int nVertices;
     float *vertexBuffer;
@@ -14,7 +12,7 @@ class Model {
 
 public:
 
-    void loadVertexData(vector<vec3> vertices, GLint shader, string vertexAttributeName);
+    void loadVertexData(std::vector<glm::vec3> vertices, GLint shader, std::string vertexAttributeName);
 
     void drawSolid();
 

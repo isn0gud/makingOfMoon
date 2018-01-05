@@ -1,6 +1,6 @@
-#include "RendererInputHandler.hpp"
+#include "SphereRendererInputHandler.hpp"
 
-void RendererInputHandler::onKeyEvent(int key, int scancode, int action, int mods) {
+void SphereRendererInputHandler::onKeyEvent(int key, int scancode, int action, int mods) {
     if (action == GLFW_PRESS) {
         if (key == GLFW_KEY_W)
             wKeyIsPressed = true;
@@ -30,7 +30,7 @@ void RendererInputHandler::onKeyEvent(int key, int scancode, int action, int mod
     }
 }
 
-void RendererInputHandler::onMouseButtonEvent(int button, int action, int mods) {
+void SphereRendererInputHandler::onMouseButtonEvent(int button, int action, int mods) {
     if (action == GLFW_PRESS) {
         mouseIsPressed = true;
         WindowManager::getInstance()->disableCursor();
@@ -40,7 +40,7 @@ void RendererInputHandler::onMouseButtonEvent(int button, int action, int mods) 
     }
 }
 
-void RendererInputHandler::onCursorPositionChanged(double xPos, double yPos) {
+void SphereRendererInputHandler::onCursorPositionChanged(double xPos, double yPos) {
     glm::vec2 lastMousePosition = mousePosition;
     mousePosition = glm::vec2((float) xPos, (float) yPos);
 
@@ -48,7 +48,12 @@ void RendererInputHandler::onCursorPositionChanged(double xPos, double yPos) {
         mouseMovement += mousePosition - lastMousePosition;
 }
 
-const RendererInputDerivedData &RendererInputHandler::getDerivedData() {
+void SphereRendererInputHandler::onScrollChanged(double xScrollOffset, double yScrollOffest)
+{
+
+}
+
+const RendererInputDerivedData &SphereRendererInputHandler::getDerivedData() {
     data.cameraLocalVelocity = glm::vec3(0);
     if (wKeyIsPressed)
         data.cameraLocalVelocity.z += -1;

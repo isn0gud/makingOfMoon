@@ -8,16 +8,15 @@
 
 #include "../../Renderer_I.hpp"
 #include "../../ShaderProgram.hpp"
-#include "../../Camera_I.hpp"
+#include "CameraRotateCenter.hpp"
+#include "SpriteRendererInputHandler.hpp"
 
 class ParticleRenderer : public Renderer_I {
 
 public:
     void init() override;
 
-    explicit ParticleRenderer(Camera_I *camera);
-
-//    Particles *allocateParticles(int numParticles) override;
+    explicit ParticleRenderer(int windowWidth, int windowHeight);
 
     glm::vec4 *allocateParticlesAndInit_cpu(int numParticles, glm::vec4 *particlesPos) override;
 
@@ -27,6 +26,10 @@ public:
     void render() override;
 
     void destroy() override;
+
+    Camera_I *getCamera() override;
+
+    InputHandler_I *getInputHandler() override;
 
 private:
     /// Generates the star flare texture
@@ -65,6 +68,6 @@ private:
     int blurDownscale{};         ///< Downscale factor for the blurring step
 
     size_t numParticles{};
-    Camera_I *camera;
-
+    CameraRotateCenter* camera;
+    SpriteRendererInputHandler* inputHandler;
 };

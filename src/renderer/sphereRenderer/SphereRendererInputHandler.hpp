@@ -1,6 +1,7 @@
 #pragma once
 
 #include "../../common.hpp"
+#include "../../InputHandler_I.hpp"
 
 struct RendererInputDerivedData {
     glm::vec3 cameraLocalVelocity;
@@ -8,7 +9,7 @@ struct RendererInputDerivedData {
 };
 
 // class that handles the user input of the renderer and makes it available in a more easily processed format
-class RendererInputHandler : public KeyEventListener, public MouseButtonEventListener, public CursorPositionListener {
+class SphereRendererInputHandler : public InputHandler_I {
 private:
     bool mouseIsPressed;
     bool wKeyIsPressed;
@@ -24,7 +25,7 @@ private:
     RendererInputDerivedData data;
 
 public:
-    RendererInputHandler() {
+    SphereRendererInputHandler() {
         mouseIsPressed = false;
         wKeyIsPressed = false;
         aKeyIsPressed = false;
@@ -36,11 +37,13 @@ public:
         data.cameraLocalVelocity = glm::vec3(0);
     }
 
-    void onKeyEvent(int key, int scancode, int action, int mods);
+    void onKeyEvent(int key, int scancode, int action, int mods) override;
 
-    void onMouseButtonEvent(int button, int action, int mods);
+    void onMouseButtonEvent(int button, int action, int mods) override;
 
-    void onCursorPositionChanged(double xPos, double yPos);
+    void onCursorPositionChanged(double xPos, double yPos) override;
+
+    void onScrollChanged(double xScrollOffset, double yScrollOffest) override;
 
     const RendererInputDerivedData &getDerivedData();
 };

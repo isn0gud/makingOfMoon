@@ -3,6 +3,7 @@
 #include <algorithm>
 #include <glm/gtc/type_ptr.hpp>
 #include <cuda_gl_interop.h>
+#include "CameraRotateCenter.hpp"
 
 
 const int FBO_MARGIN = 50;
@@ -15,8 +16,10 @@ void ParticleRenderer::init() {
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
     // OpenGL initialization
+    glewExperimental = GL_TRUE;
     GLenum error = glewInit();
     if (error != GLEW_OK) {
+        std::cout << "PROBLEMS! CANNOT LOAD OpenGL!" << std::endl;
         throw std::runtime_error("Can't load GL");
     }
 
@@ -130,7 +133,7 @@ void ParticleRenderer::initFbos() {
                      base_height / blur_dsc,
                      base_height / 2};
 
-    lumLod = (int) floor(log2(max(base_width, base_height) / 2));
+    lumLod = (int) floor(log2((double)max(base_width, base_height) / 2));
     int mipmaps[] = {1, 1, 1, lumLod + 1};
     GLenum types[] = {GL_RGBA16F, GL_RGBA16F, GL_RGBA16F, GL_R16F};
     GLenum min_filters[] = {GL_LINEAR, GL_LINEAR, GL_LINEAR, GL_LINEAR_MIPMAP_LINEAR};
@@ -162,6 +165,9 @@ void ParticleRenderer::setUniforms() {
 
 
 void ParticleRenderer::render() {
+
+    camera->applyInput();
+
     // Particle HDR rendering
     glViewport(0, 0, camera->getWindowWidth() + 2 * FBO_MARGIN, camera->getWindowHeight() + 2 * FBO_MARGIN);
     glBindVertexArray(vaoParticles);
@@ -221,7 +227,21 @@ void ParticleRenderer::render() {
     glDrawArrays(GL_TRIANGLES, 0, 3);
 }
 
-ParticleRenderer::ParticleRenderer(Camera_I *camera) : camera(camera) {}
+ParticleRenderer::ParticleRenderer(int windowWidth, int windowHeight)
+{
+    camera = new CameraRotateCenter(windowWidth, windowHeight);
+    inputHandler = new SpriteRendererInputHandler(camera);
+}
+
+Camera_I* ParticleRenderer::getCamera()
+{
+    return camera;
+}
+
+InputHandler_I* ParticleRenderer::getInputHandler()
+{
+    return inputHandler;
+}
 
 void ParticleRenderer::destroy() {
 
@@ -248,7 +268,6 @@ glm::vec4 *ParticleRenderer::allocateParticlesAndInit_cpu(int numParticles, glm:
     } else {
         return particlePosPointer;
     }
-
 }
 
 cudaGraphicsResource_t ParticleRenderer::allocateParticlesAndInit_gpu(int numParticles, glm::vec4 *particlesPos) {
