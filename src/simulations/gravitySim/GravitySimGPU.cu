@@ -96,18 +96,16 @@ void GravitySimGPU::updateStep(int numTimeSteps) {
 
 
     // Update the position of the particles
-    update_step << < 256, 256 >> > (d_particles, p_cuda); //TODO make number of threads adaptive
-
+    update_step<<<256, 256>>>(d_particles, p_cuda); //TODO make number of threads adaptive
 
     // Unmap the SSBO to be available to OpenGL
     checkCudaErrors(cudaGraphicsUnmapResources(1, &vboParticlesPos_cuda));
-    checkCudaErrors(cudaPeekAtLastError());
-//    checkCudaErrors(cudaDeviceSynchronize());
+    //checkCudaErrors(cudaPeekAtLastError());
+    cudaDeviceSynchronize();
 }
 
 GravitySimGPU::GravitySimGPU(Particles *particles, cudaGraphicsResource_t particlePos) :
-        vboParticlesPos_cuda(
-                particlePos) {
+        vboParticlesPos_cuda(particlePos) {
     numParticles = particles->numParticles;
     p_cuda = particles->to_cuda();
 }

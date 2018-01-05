@@ -1,8 +1,11 @@
 #include <iostream>
 
 #include "WindowInputHandler.hpp"
+//#include "renderer/spritesRenderer/ParticleSpriteRenderer.cuh"
+//#include "renderer/spritesRenderer/InputHandler.hpp"
 #include "renderer/spritesRenderer/ParticleSpriteRenderer.cuh"
-#include "renderer/spritesRenderer/InputHandler.hpp"
+#include "renderer/spritesRenderer/SpriteRendererInputHandler.hpp"
+#include "renderer/sphereRenderer/SphereRenderer.cuh"
 #include "Timer.hpp"
 
 #include <thread>
@@ -46,24 +49,21 @@ int main(int argc, char **argv) {
 //    glfwWindowHint(GLFW_BLUE_BITS, mode->blueBits);
 //    glfwWindowHint(GLFW_REFRESH_RATE, mode->refreshRate);
 //    glfwWindowHint(GLFW_RESIZABLE, GLFW_FALSE);
-    CameraRotateCenter camera(WINDOW_WIDTH, WINDOW_HEIGHT);
-    InputHandler inputHandler(&camera);
-    ParticleSpriteRenderer renderer(&camera);
-
+    Renderer_I* renderer = new SphereRenderer(WINDOW_WIDTH, WINDOW_HEIGHT);
+    Camera_I* camera = renderer->getCamera();
+    InputHandler_I* inputHandler = renderer->getInputHandler();
 
     WindowInputHandler windowInputHandler;
     wm->addKeyEventListener(&windowInputHandler);
-    wm->addWindowEventListener(&camera);
-
-    wm->addKeyEventListener(&inputHandler);
-    wm->addScrollListener(&inputHandler);
-    wm->addCursorPositionListener(&inputHandler);
-    wm->addMouseButtonEventListener(&inputHandler);
+    wm->addWindowEventListener(camera);
+    wm->addKeyEventListener(inputHandler);
+    wm->addScrollListener(inputHandler);
+    wm->addCursorPositionListener(inputHandler);
+    wm->addMouseButtonEventListener(inputHandler);
 
     //TODO change to constructor?
-    renderer.init();
+    renderer->init();
     Particles *particles = new Particles(NUM_PARTICLES);
-
     PlanetBuilder::buildPlanet(particles,
                                Particles::TYPE::IRON, 1220.f * 0.25f,
                                Particles::TYPE::SILICATE, 6371.f * 0.25f,
@@ -77,9 +77,8 @@ int main(int argc, char **argv) {
 //    ///\CPU
     std::cout << "sizeof particles: " << particles->sizeInBytes() << " BYTES" << std::endl;
     ///GPU GRAVITY
-    GravitySimGPU sim(particles, renderer.allocateParticlesAndInit_gpu(NUM_PARTICLES, particles->pos));
+    GravitySimGPU sim(particles, renderer->allocateParticlesAndInit_gpu(NUM_PARTICLES, particles->pos));
     ///\GPU
-
 
 //    ///CPU
 //    particles->setParticlePos(renderer.allocateParticlesAndInit_cpu(NUM_PARTICLES, particles->pos));
@@ -101,18 +100,16 @@ int main(int argc, char **argv) {
         if (frameTime > MAX_FRAME_TIME)
             frameTime = MAX_FRAME_TIME;
 
-        camera.applyInput();
-
         sim.updateStep(1);
 
-        renderer.render();
+        renderer->render();
 
         wm->swapBuffers();
 
         wm->setTitle(windowTitle + " @" + std::to_string(1 / frameTime) + " fps");
 
     }
-    renderer.destroy();
+    renderer->destroy();
     wm->close();
     return 0;
 }

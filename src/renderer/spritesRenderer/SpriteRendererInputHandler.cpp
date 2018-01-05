@@ -1,6 +1,6 @@
-#include "InputHandler.hpp"
+#include "SpriteRendererInputHandler.hpp"
 
-void InputHandler::onKeyEvent(int key, int scancode, int action, int mods) {
+void SpriteRendererInputHandler::onKeyEvent(int key, int scancode, int action, int mods) {
     if (action == GLFW_PRESS) {
         if (key == GLFW_KEY_W)
             wKeyIsPressed = true;
@@ -30,7 +30,7 @@ void InputHandler::onKeyEvent(int key, int scancode, int action, int mods) {
     }
 }
 
-void InputHandler::onMouseButtonEvent(int button, int action, int mods) {
+void SpriteRendererInputHandler::onMouseButtonEvent(int button, int action, int mods) {
     if (action == GLFW_PRESS) {
         mouseIsPressed = true;
         WindowManager::getInstance()->disableCursor();
@@ -40,7 +40,7 @@ void InputHandler::onMouseButtonEvent(int button, int action, int mods) {
     }
 }
 
-void InputHandler::onCursorPositionChanged(double input_xPos, double input_yPos) {
+void SpriteRendererInputHandler::onCursorPositionChanged(double input_xPos, double input_yPos) {
 // View movement
     if (mouseIsPressed) {
         if (!drag) {
@@ -63,35 +63,14 @@ void InputHandler::onCursorPositionChanged(double input_xPos, double input_yPos)
 
 }
 
-//const RendererInputDerivedData &InputHandler::getDerivedData() {
-//    data.cameraLocalVelocity = glm::vec3(0);
-//    if (wKeyIsPressed)
-//        data.cameraLocalVelocity.z += -1;
-//    if (sKeyIsPressed)
-//        data.cameraLocalVelocity.z += 1;
-//    if (aKeyIsPressed)
-//        data.cameraLocalVelocity.x += -1;
-//    if (dKeyIsPressed)
-//        data.cameraLocalVelocity.x += 1;
-//    if (rKeyIsPressed)
-//        data.cameraLocalVelocity.y += 1;
-//    if (fKeyIsPressed)
-//        data.cameraLocalVelocity.y += -1;
-//
-//    data.mouseMovement = mouseMovement;
-//    mouseMovement = glm::vec2(0);
-//
-//    return data;
-//}
-
-void InputHandler::onScrollChanged(double xScrollOffset, double yScrollOffest) {
+void SpriteRendererInputHandler::onScrollChanged(double xScrollOffset, double yScrollOffest) {
     scroll += yScrollOffest;
     // Scrolling
     camera->addVelocity(glm::vec3(0, 0, scroll * 0.02));
     scroll = 0;
 }
 
-InputHandler::InputHandler(CameraRotateCenter *camera) : camera(camera) {
+SpriteRendererInputHandler::SpriteRendererInputHandler(CameraRotateCenter *camera) : camera(camera) {
     mouseIsPressed = false;
     wKeyIsPressed = false;
     aKeyIsPressed = false;

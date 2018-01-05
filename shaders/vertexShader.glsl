@@ -1,9 +1,14 @@
-#version 330 core
+#version 450 core
+
 layout (location = 0) in vec3 aPos;
+
+buffer particles_ssbo
+{
+    vec4 pos[];
+};
 
 uniform mat4 mvp;
 
 void main(){
-    gl_Position = mvp * vec4(aPos, 1.0);
-
+    gl_Position = mvp * (pos[gl_InstanceID] + aPos);
 }

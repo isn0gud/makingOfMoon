@@ -1,45 +1,53 @@
 #include "PlanetBuilder.hpp"
 
 #define PI 3.14159265359
-#define estimatedPackingEfficiency 0.5
-
+#define estimatedPackingEfficiency 0.74 // packing efficency of a ffc-lattice
 
 void PlanetBuilder::buildPlanet(Particles *particles, Particles::TYPE coreType, float coreRadius,
                                 Particles::TYPE outerLayerType, float radius, glm::vec3 position, glm::vec3 velocity,
                                 glm::vec3 angularVelocity) {
+    float planetVolume = 4 * PI * radius * radius * radius / 3;
+    float particleVolume = estimatedPackingEfficiency * planetVolume / particles->numParticles;
+    float particleRadius = pow(3*particleVolume / (4*PI), 1.0f/3.0f);
 
-    float volumePerParticleInCore =
-            estimatedPackingEfficiency * 4 * PI * coreRadius *
-            coreRadius * coreRadius / 3 / particles->numParticles;
+    // Construct an fcc-lattice
+    float latticeParameter = 2 * sqrt(2) * particleRadius;
+    int girdSize = ceil(radius / latticeParameter)+1;
 
-    float coreParticleRadius = pow(3 * volumePerParticleInCore /
-                                   (4 * PI), 1.0f / 3.0f);
+    glm::vec3 offsets[4] = {glm::vec3(0, 0, 0),
+                            glm::vec3(latticeParameter/2, latticeParameter/2, 0),
+                            glm::vec3(latticeParameter/2, 0, latticeParameter/2),
+                            glm::vec3(0, latticeParameter/2, latticeParameter/2)};
 
-    float volumePerParticleInOuterLayer =
-            estimatedPackingEfficiency *
-            (4 * PI * radius * radius * radius / 3) /
-            (particles->numParticles);
+    int i = 0;
+    for(int x = -girdSize; x <= girdSize; x++)
+    {
+        for(int y = -girdSize; y <= girdSize; y++)
+        {
+            for(int z = -girdSize; z <= girdSize; z++)
+            {
+                glm::vec3 fccCellPos = glm::vec3(x, y, z) * latticeParameter;
+                for(glm::vec3 offset : offsets)
+                {
+                    if(i >= particles->numParticles)
+                        return;
+                    glm::vec3 particlePositionInPlanet = fccCellPos + offset;
+                    if(glm::dot(particlePositionInPlanet, particlePositionInPlanet) <= radius*radius) // is inside planet?
+                    {
+                        if(glm::dot(particlePositionInPlanet, particlePositionInPlanet) <= coreRadius*coreRadius) // is inside core?
+                            particles->setParticleType(i, coreType, particleRadius, 1 / estimatedPackingEfficiency);
+                        else
+                            particles->setParticleType(i, outerLayerType, particleRadius, 1 / estimatedPackingEfficiency);
 
-    float outerLayerParticleRadius = pow(3 * volumePerParticleInOuterLayer /
-                                         (4 * PI), 1.0f / 3.0f);
-
-    std::cout << volumePerParticleInOuterLayer << std::endl;
-    std::cout << outerLayerParticleRadius << std::endl;
-
-    float particleRadius = 188.7;
-
-    for (int i = 0; i < particles->numParticles; i++) {
-        glm::vec3 offsetFromCenterOfPlanet = sampleRandomPointInSphericalShell(0, radius);
-
-        if (glm::length(offsetFromCenterOfPlanet) < coreRadius) {
-            particles->setParticleType(i, coreType, particleRadius);
-        } else {
-            particles->setParticleType(i, outerLayerType, particleRadius);
+                        particles->pos[i] = glm::vec4(position + particlePositionInPlanet, 0);
+                        particles->velo[i] = glm::vec4(velocity + glm::cross(angularVelocity, particlePositionInPlanet), 0); // v_rot = omega x r
+                        i++;
+                    }
+                }
+            }
         }
-
-        particles->pos[i] = glm::vec4(position + offsetFromCenterOfPlanet, 1);
-        particles->velo[i] = glm::vec4(velocity + glm::cross(angularVelocity, offsetFromCenterOfPlanet), 1);
     }
+    std::cout << "Number of planets generated: " << i << std::endl;
 }
 
 glm::vec3 PlanetBuilder::sampleRandomPointInSphericalShell(float innerRadius, float outerRadius) {

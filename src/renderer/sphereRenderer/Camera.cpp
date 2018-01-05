@@ -12,6 +12,11 @@ Camera::Camera()
     projectionMatrix = glm::perspective(fieldOfView, aspectRatio, near, far);
 }
 
+void Camera::onWindowSizeChanged(int width, int height)
+{
+    updateWindowShape((float)width, (float)height);
+}
+
 void Camera:: updateWindowShape(float width, float height)
 {
     aspectRatio = width / height;
@@ -49,17 +54,17 @@ void Camera::setOrientation(glm::vec3 forward, glm::vec3 up)
 
     orientation[0] = right;
     orientation[1] = up;
-    orientation[2] = forward * (-1);
+    orientation[2] = forward * (-1.0f);
 }
 
 glm::mat4 Camera::getViewTransformationMatrix()
 {
     glm::mat4 result;
-    result[0] = glm::vec4(orientation[0][0], orientation[0][1], orientation[0][2], 0);
-    result[1] = glm::vec4(orientation[1][0], orientation[1][1], orientation[1][2], 0);
-    result[2] = glm::vec4(orientation[2][0], orientation[2][1], orientation[2][2], 0);
-    result[3] = glm::vec4(position.x,        position.y,        position.z,        1);
-    return glm::affineInverse(result);
+    result[0] = glm::vec4(orientation[0][0], orientation[1][0], orientation[2][0], 0);
+    result[1] = glm::vec4(orientation[0][1], orientation[1][1], orientation[2][1], 0);
+    result[2] = glm::vec4(orientation[0][2], orientation[1][2], orientation[2][2], 0);
+    result[3] = glm::vec4(-position.x,        -position.y,        -position.z,     1);
+    return result;
 }
 
 glm::mat4 Camera::getModelViewProjectionMatrix(glm::mat4 modelTransformationMatrix)

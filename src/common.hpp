@@ -20,7 +20,7 @@
 #include <GLFW/glfw3.h>
 #include <glm/glm.hpp>
 
-//#define GLM_ENABLE_EXPERIMENTAL ///not compatible with cuda
+#define GLM_ENABLE_EXPERIMENTAL ///not compatible with cuda
 
 #include <glm/gtx/transform.hpp>
 #include <glm/gtc/matrix_transform.hpp>

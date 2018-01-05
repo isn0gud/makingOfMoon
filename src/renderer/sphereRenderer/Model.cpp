@@ -1,11 +1,6 @@
 #include "Model.hpp"
 
-#include "../../balls/common.hpp"
-
-
-
-
-void Model::loadVertexData(vector<vec3> vertices, GLint shader, string vertexAttributeName) {
+void Model::loadVertexData(std::vector<glm::vec3> vertices, GLint shader, std::string vertexAttributeName) {
     nVertices = vertices.size();
     vertexBuffer = new float[vertices.size() * 3];
     for (int i = 0; i < nVertices; i++) {
@@ -40,8 +35,6 @@ void Model::drawWireframe() {
 }
 
 void Model::freeVertexData() {
-    // Free data from GPU ...
-
-
+    glDeleteBuffers(1, &vertexBufferId);
     delete[] vertexBuffer;
 }

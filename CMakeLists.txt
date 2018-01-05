@@ -1,17 +1,20 @@
 cmake_minimum_required(VERSION 3.9)
+set(CMAKE_CUDA_COMPILER "/usr/local/cuda/bin/nvcc")
 
 project(makingOfMoon LANGUAGES CXX CUDA)
 
+set(CMAKE_INSTALL_PREFIX "lib/builds")
+set(CMAKE_C_COMPILER "/usr/bin/gcc")
+set(CMAKE_CXX_COMPILER "/usr/bin/g++")
 
-#set(CMAKE_INSTALL_PREFIX "lib/builds")
 
-#set(GLEW_LOCATION "lib/glew-2.1.0/glew_compiled/usr") # compile with "make install DESTDIR=glew_compiled"
+set(GLEW_LOCATION "lib/glew-2.1.0/glew_compiled/usr") # compile with "make install DESTDIR=glew_compiled"
 
-#set(OPENGL_INCLUDE_DIR "lib/glfw/include")
+set(OPENGL_INCLUDE_DIR "lib/glfw/include")
 
-#set(GLFW_LOCATION "lib/glfw/glfw_compiled/usr/local") # compile with "make install DESTDIR=glfw_compiled"
+set(GLFW_LOCATION "lib/glfw/glfw_compiled/usr/local") # compile with "make install DESTDIR=glfw_compiled"
 
-#set(GLM_INCLUDE_DIR "lib/glm")
+set(GLM_INCLUDE_DIR "lib/glm")
 
 list(APPEND CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/cmake)
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR})
@@ -35,11 +38,14 @@ set(
 
 set(CUDA_SEPARABLE_COMPILATION ON)
 set(CUDA_PROPAGATE_HOST_FLAGS OFF)
-set(CUDA_HOST_COMPILER clang++)
+set(CMAKE_CUDA_HOST_COMPILER usr/bin/g++)
 
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
 
-find_package(GLFW REQUIRED)
+set(GLFW_BUILD_DOCS OFF CACHE BOOL "" FORCE)
+    set(GLFW_BUILD_TESTS OFF CACHE BOOL "" FORCE)
+    set(GLFW_BUILD_EXAMPLES OFF CACHE BOOL "" FORCE)
+    find_package(glfw3 3.2 REQUIRED)
 find_package(GLEW REQUIRED)
 find_package(GLM REQUIRED)
 find_package(OpenGL REQUIRED)
@@ -78,6 +84,16 @@ set(SOURCE_FILES
 #        src/renderer/sphereRenderer/StaticSphere.hpp
 #        src/renderer/sphereRenderer/StaticSphere.cpp
 
+        src/renderer/sphereRenderer/SphereRenderer.cuh
+        src/renderer/sphereRenderer/SphereRenderer.cu
+        src/renderer/sphereRenderer/Model.hpp
+        src/renderer/sphereRenderer/Model.cpp
+        src/renderer/sphereRenderer/Camera.hpp
+        src/renderer/sphereRenderer/Camera.cpp
+        src/renderer/sphereRenderer/GeometryBuilder.hpp
+        src/renderer/sphereRenderer/GeometryBuilder.cpp
+        src/renderer/sphereRenderer/SphereRendererInputHandler.hpp
+        src/renderer/sphereRenderer/SphereRendererInputHandler.cpp
 
         src/util/helper_cuda.h
         src/util/helper_string.h
@@ -90,11 +106,12 @@ set(SOURCE_FILES
         src/Particles.hpp
         src/WindowManager.hpp
         src/WindowManager.cpp
-        src/renderer/spritesRenderer/InputHandler.hpp
-        src/renderer/spritesRenderer/InputHandler.cpp
+        src/renderer/spritesRenderer/SpriteRendererInputHandler.hpp
+        src/renderer/spritesRenderer/SpriteRendererInputHandler.cpp
         src/ParticleSim_I.hpp
         src/Renderer_I.hpp
         src/Camera_I.hpp
+        src/InputHandler_I.hpp
         src/WindowInputHandler.hpp
         src/main.cpp
         src/simulations/testSim/RndTestSimGPU.cu
@@ -112,5 +129,5 @@ target_include_directories(makingOfMoon PRIVATE
         ${GLEW_INCLUDE_DIR}
         ${OPENGL_INCLUDE_DIR})
 
-target_link_libraries(makingOfMoon ${GLFW_LIBRARIES} ${GLEW_LIBRARY} ${OPENGL_gl_LIBRARY})
+target_link_libraries(makingOfMoon ${CMAKE_DL_LIBS} glfw ${GLFW_LIBRARIES} ${GLEW_LIBRARY} ${OPENGL_gl_LIBRARY} )
 

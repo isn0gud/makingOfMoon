@@ -1,8 +1,9 @@
 #pragma once
 
 #include "../../common.hpp"
+#include "../../Camera_I.hpp"
 
-class Camera {
+class Camera : public Camera_I {
 private:
     float fieldOfView;
     float aspectRatio;
@@ -29,6 +30,8 @@ public:
     glm::mat4 getProjectionMatrix();
 
     glm::mat4 getModelViewProjectionMatrix(glm::mat4 modelTransformationMatrix);
+
+    void onWindowSizeChanged(int width, int height) override;
 };
 
 

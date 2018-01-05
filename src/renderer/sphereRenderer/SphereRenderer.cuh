@@ -1,32 +1,36 @@
 #pragma once
 
-#include <driver_types.h>
 #include "../../common.hpp"
 #include "../../Renderer_I.hpp"
+#include "../../Particles.hpp"
 #include "../spritesRenderer/CameraRotateCenter.hpp"
 #include "../../ShaderProgram.hpp"
-#include "../../Camera_I.hpp"
+#include "SphereRendererInputHandler.hpp"
 
-#include "Sphere.hpp"
+
+#include "Camera.hpp"
 #include "Model.hpp"
 
-class ParticleSphereRenderer : public Renderer_I {
+class SphereRenderer : public Renderer_I {
 protected:
 
-
-//    Camera camera;
+    Camera camera;
+    SphereRendererInputHandler inputHandler;
     ShaderProgram shaderProgram;
     Model sphereModel;
 
+    int numParticles;
+    GLuint vboParticlesPos{};
+
     float cameraAzimuthAngle;
     float cameraPolarAngle;
-
-    Camera_I *camera;
 
     void updateCamera(float frameTime);
 
 public:
     void init() override;
+
+    explicit SphereRenderer(int windowWidth, int windowHeight);
 
     glm::vec4 *allocateParticlesAndInit_cpu(int numParticles, glm::vec4 *particlesPos) override;
 
@@ -36,21 +40,8 @@ public:
 
     void destroy() override;
 
-//    void init() override;
-//
-//    Particles *allocateParticles(int numParticles) override;
-//
-//    void render() override;
-//
-//    void destroy() override;
-//
-//    ParticleSphereRenderer(CameraRotateCenter *camera);
+    Camera_I *getCamera() override;
 
-//    void init(int windowWidth, int windowHeight);
-
-//    void render(const std::vector<Sphere *> &spheres, float frameTime);
-//
-//    void clear();
-//
-//    void onWindowSizeChanged(int width, int height);
+    InputHandler_I *getInputHandler() override;
 };
+

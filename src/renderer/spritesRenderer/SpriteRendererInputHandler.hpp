@@ -3,14 +3,11 @@
 #include "../../common.hpp"
 #include "../../WindowManager.hpp"
 #include "CameraRotateCenter.hpp"
+#include "../../InputHandler_I.hpp"
 
 
 // class that handles the user input of the renderer and makes it available in a more easily processed format
-class InputHandler
-        : public KeyEventListener,
-          public MouseButtonEventListener,
-          public CursorPositionListener,
-          public ScrollListener {
+class SpriteRendererInputHandler : public InputHandler_I {
 private:
     bool mouseIsPressed;
     bool wKeyIsPressed;
@@ -31,7 +28,7 @@ private:
     bool drag = false;
 
 public:
-    explicit InputHandler(CameraRotateCenter *camera);
+    explicit SpriteRendererInputHandler(CameraRotateCenter *camera);
 
     void onKeyEvent(int key, int scancode, int action, int mods) override;
 
