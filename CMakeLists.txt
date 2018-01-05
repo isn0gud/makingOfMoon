@@ -68,22 +68,6 @@ set(SOURCE_FILES
         src/renderer/spritesRenderer/ParticleSpriteRenderer.cu
 
 
-#        src/renderer/sphereRenderer/ParticleSphereRenderer.hpp
-#        src/renderer/sphereRenderer/ParticleSphereRenderer.cpp
-#        src/renderer/sphereRenderer/Camera.hpp
-#        src/renderer/sphereRenderer/Camera.cpp
-#        src/renderer/sphereRenderer/GeometryBuilder.hpp
-#        src/renderer/sphereRenderer/GeometryBuilder.cpp
-#        src/renderer/sphereRenderer/Model.hpp
-#        src/renderer/sphereRenderer/Model.cpp
-#        src/renderer/sphereRenderer/ParticleSphere.hpp
-#        src/renderer/sphereRenderer/ParticleSphere.cpp
-#        src/renderer/sphereRenderer/RendererInputHandler.hpp
-#        src/renderer/sphereRenderer/RendererInputHandler.cpp
-#        src/renderer/sphereRenderer/Sphere.hpp
-#        src/renderer/sphereRenderer/StaticSphere.hpp
-#        src/renderer/sphereRenderer/StaticSphere.cpp
-
         src/renderer/sphereRenderer/SphereRenderer.cuh
         src/renderer/sphereRenderer/SphereRenderer.cu
         src/renderer/sphereRenderer/Model.hpp
