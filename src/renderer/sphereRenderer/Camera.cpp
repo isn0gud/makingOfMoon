@@ -1,5 +1,7 @@
 #include "Camera.hpp"
 
+#include "glm/gtc/matrix_inverse.hpp"
+
 Camera::Camera()
 {
     position = glm::vec3(0.0f, 0.0f, 0.0f);
@@ -60,14 +62,20 @@ void Camera::setOrientation(glm::vec3 forward, glm::vec3 up)
 glm::mat4 Camera::getViewTransformationMatrix()
 {
     glm::mat4 result;
-    result[0] = glm::vec4(orientation[0][0], orientation[1][0], orientation[2][0], 0);
-    result[1] = glm::vec4(orientation[0][1], orientation[1][1], orientation[2][1], 0);
-    result[2] = glm::vec4(orientation[0][2], orientation[1][2], orientation[2][2], 0);
-    result[3] = glm::vec4(-position.x,        -position.y,        -position.z,     1);
-    return result;
+    result[0] = glm::vec4(orientation[0][0], orientation[0][1], orientation[0][2], 0);
+    result[1] = glm::vec4(orientation[1][0], orientation[1][1], orientation[1][2], 0);
+    result[2] = glm::vec4(orientation[2][0], orientation[2][1], orientation[2][2], 0);
+    result[3] = glm::vec4(position.x,        position.y,        position.z,     1);
+    return glm::affineInverse(result);
 }
 
 glm::mat4 Camera::getModelViewProjectionMatrix(glm::mat4 modelTransformationMatrix)
 {
     return projectionMatrix * getViewTransformationMatrix() * modelTransformationMatrix;
 }
+
+glm::mat4 Camera::getViewProjectionMatrix()
+{
+    return projectionMatrix * getViewTransformationMatrix();
+}
+

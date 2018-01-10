@@ -15,8 +15,10 @@ public:
     void loadVertexData(std::vector<glm::vec3> vertices, GLint shader, std::string vertexAttributeName);
 
     void drawSolid();
-
     void drawWireframe();
+
+    void drawSolidInstanced(int numberOfInstances);
+    void drawWireframeInstanced(int numberOfInstances);
 
     void freeVertexData();
 };

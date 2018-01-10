@@ -22,6 +22,9 @@ protected:
     int numParticles;
     GLuint vboParticlesPos{};
 
+    GLuint particleSSBOLocation;
+    GLuint particleSSBOBufferObject;
+
     float cameraAzimuthAngle;
     float cameraPolarAngle;
 

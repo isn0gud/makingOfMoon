@@ -10,5 +10,7 @@ buffer particles_ssbo
 uniform mat4 mvp;
 
 void main(){
-    gl_Position = mvp * (pos[gl_InstanceID] + aPos);
+    float radius = 84.2497;
+    /*gl_Position = mvp * (vec4(radius*aPos, 1));*/
+    gl_Position = mvp * (pos[gl_InstanceID] + vec4(radius*aPos, 1));
 }

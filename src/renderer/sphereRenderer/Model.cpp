@@ -11,6 +11,11 @@ void Model::loadVertexData(std::vector<glm::vec3> vertices, GLint shader, std::s
 
     GLint vertexAttributeLocation = glGetAttribLocation(shader, vertexAttributeName.c_str());
 
+    if (glGenVertexArrays == NULL)
+    {
+        std::cout << "WTF!" << std::endl;
+    }
+
     glGenVertexArrays(1, &vertexArrayObjectId);
     glBindVertexArray(vertexArrayObjectId);
     glGenBuffers(1, &vertexBufferId);
@@ -31,6 +36,20 @@ void Model::drawWireframe() {
     glBindBuffer(GL_ARRAY_BUFFER, vertexBufferId);
     glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
     glDrawArrays(GL_TRIANGLES, 0, nVertices);
+    glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+}
+
+void Model::drawSolidInstanced(int numberOfInstances) {
+    glBindVertexArray(vertexArrayObjectId);
+    glBindBuffer(GL_ARRAY_BUFFER, vertexBufferId);
+    glDrawArraysInstanced(GL_TRIANGLES, 0, nVertices, numberOfInstances);
+}
+
+void Model::drawWireframeInstanced(int numberOfInstances) {
+    glBindVertexArray(vertexArrayObjectId);
+    glBindBuffer(GL_ARRAY_BUFFER, vertexBufferId);
+    glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+    glDrawArraysInstanced(GL_TRIANGLES, 0, nVertices, numberOfInstances);
     glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 }
 

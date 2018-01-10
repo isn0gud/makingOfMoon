@@ -6,10 +6,11 @@
 #include "vector_types.h"
 #include "../../util/helper_cuda.h"
 
-
 #define timeStep 10.0f
 #define COLL_SPEED 1.5
 #define CUBE_SIDE 5
+
+#define BLOCK_SIZE 256
 
 //  units: SI, but km instead of m
 //  6.674×10−20 (km)^3⋅kg^(−1)⋅s^(−2)
@@ -18,6 +19,7 @@
 
 __global__ void update_step(glm::vec4 *pPos, Particles::Particles_cuda *particles) {
     int i = blockIdx.x * blockDim.x + threadIdx.x;
+
     particles->numParticles = 5000; //TODO add numParticles as parameter
     if (i < particles->numParticles) {
         //TODO add update steps
@@ -94,14 +96,15 @@ void GravitySimGPU::updateStep(int numTimeSteps) {
     checkCudaErrors(cudaGraphicsResourceGetMappedPointer((void **) &d_particles,
                                                          &size, vboParticlesPos_cuda));
 
-
+    int numberOfBlocks = (numParticles + BLOCK_SIZE - 1) / BLOCK_SIZE;
     // Update the position of the particles
-    update_step<<<256, 256>>>(d_particles, p_cuda); //TODO make number of threads adaptive
-
+    update_step<<<numberOfBlocks, BLOCK_SIZE>>>(d_particles, p_cuda);
+    cudaError_t err = cudaGetLastError();
+    if (err != cudaSuccess)
+        printf("Error: %s\n", cudaGetErrorString(err));
+    cudaDeviceSynchronize();
     // Unmap the SSBO to be available to OpenGL
     checkCudaErrors(cudaGraphicsUnmapResources(1, &vboParticlesPos_cuda));
-    //checkCudaErrors(cudaPeekAtLastError());
-    cudaDeviceSynchronize();
 }
 
 GravitySimGPU::GravitySimGPU(Particles *particles, cudaGraphicsResource_t particlePos) :

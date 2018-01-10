@@ -30,6 +30,7 @@ public:
     glm::mat4 getProjectionMatrix();
 
     glm::mat4 getModelViewProjectionMatrix(glm::mat4 modelTransformationMatrix);
+    glm::mat4 getViewProjectionMatrix();
 
     void onWindowSizeChanged(int width, int height) override;
 };

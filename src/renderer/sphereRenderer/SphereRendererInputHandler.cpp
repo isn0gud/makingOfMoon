@@ -53,7 +53,7 @@ void SphereRendererInputHandler::onScrollChanged(double xScrollOffset, double yS
 
 }
 
-const RendererInputDerivedData &SphereRendererInputHandler::getDerivedData() {
+const ShpereRendererInputDerivedData &SphereRendererInputHandler::getDerivedData() {
     data.cameraLocalVelocity = glm::vec3(0);
     if (wKeyIsPressed)
         data.cameraLocalVelocity.z += -1;

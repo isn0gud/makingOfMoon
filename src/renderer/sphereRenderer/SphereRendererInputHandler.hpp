@@ -3,7 +3,7 @@
 #include "../../common.hpp"
 #include "../../InputHandler_I.hpp"
 
-struct RendererInputDerivedData {
+struct ShpereRendererInputDerivedData {
     glm::vec3 cameraLocalVelocity;
     glm::vec2 mouseMovement;
 };
@@ -22,7 +22,7 @@ private:
     glm::vec2 mouseMovement;
     glm::vec2 mousePosition;
 
-    RendererInputDerivedData data;
+    ShpereRendererInputDerivedData data;
 
 public:
     SphereRendererInputHandler() {
@@ -35,6 +35,9 @@ public:
         fKeyIsPressed = false;
         data.mouseMovement = glm::vec2(0);
         data.cameraLocalVelocity = glm::vec3(0);
+
+        mousePosition = glm::vec2(0);
+        mouseMovement = glm::vec2(0);
     }
 
     void onKeyEvent(int key, int scancode, int action, int mods) override;
@@ -45,5 +48,5 @@ public:
 
     void onScrollChanged(double xScrollOffset, double yScrollOffest) override;
 
-    const RendererInputDerivedData &getDerivedData();
+    const ShpereRendererInputDerivedData &getDerivedData();
 };

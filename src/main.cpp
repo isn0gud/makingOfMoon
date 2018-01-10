@@ -68,29 +68,19 @@ int main(int argc, char **argv) {
                                Particles::TYPE::IRON, 1220.f * 0.25f,
                                Particles::TYPE::SILICATE, 6371.f * 0.25f,
             //glm::vec3(0), glm::vec3(0), glm::vec3(0, 7.2921159e-5, 0),
-                               glm::vec3(0), glm::vec3(0), glm::vec3(0, 0, 0));
+                               glm::vec3(0), glm::vec3(0,0,0), glm::vec3(0, 0, 0));
 
 
 //    ///CPU GRAVITY
 //    particles->setParticlePos(renderer.allocateParticlesAndInit_cpu(NUM_PARTICLES, particles->pos));
 //    GravitySimCPU sim(particles);
 //    ///\CPU
-    std::cout << "sizeof particles: " << particles->sizeInBytes() << " BYTES" << std::endl;
+
     ///GPU GRAVITY
     GravitySimGPU sim(particles, renderer->allocateParticlesAndInit_gpu(NUM_PARTICLES, particles->pos));
     ///\GPU
 
-//    ///CPU
-//    particles->setParticlePos(renderer.allocateParticlesAndInit_cpu(NUM_PARTICLES, particles->pos));
-//    RndTestSimCPU sim(particles);
-//    ///\CPU
-
-//    ///GPU
-//    RndTestSimGPU sim(particles, renderer.allocateParticlesAndInit_gpu(NUM_PARTICLES, particles->pos));
-//    ///\GPU
-
     displayOpenGLInfo();
-
     Timer timer;
     timer.start();
 
@@ -100,10 +90,10 @@ int main(int argc, char **argv) {
         if (frameTime > MAX_FRAME_TIME)
             frameTime = MAX_FRAME_TIME;
 
+        usleep(10000);
+
         sim.updateStep(1);
-
         renderer->render();
-
         wm->swapBuffers();
 
         wm->setTitle(windowTitle + " @" + std::to_string(1 / frameTime) + " fps");

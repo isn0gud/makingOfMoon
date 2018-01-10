@@ -87,7 +87,7 @@ void WindowManager::open(int width, int height, std::string title, bool vsync) {
     glfwSetCursorPosCallback(window, cursorPositionCallbackFunction);
     glfwSetScrollCallback(window, scrollCallbackFunction);
 
-
+    glewExperimental = true;
     GLenum error = glewInit();
     if (error != GLEW_OK) {
         throw std::runtime_error("Can't load GL");
