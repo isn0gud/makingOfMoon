@@ -6,7 +6,7 @@
 #include "vector_types.h"
 #include "../../util/helper_cuda.h"
 
-#define timeStep 10.0f
+#define timeStep 1.0f
 #define COLL_SPEED 1.5
 #define CUBE_SIDE 5
 
@@ -23,9 +23,11 @@ __global__ void update_step(glm::vec4 *pPos, Particles::Particles_cuda *particle
     particles->numParticles = NUM_PARTICLES; //TODO add numParticles as parameter
     if (i < particles->numParticles) {
         //TODO add update steps
-        for (int j = i + 1; j < particles->numParticles; j++) {
+        for (int j = 0; j < particles->numParticles; j++) {
+            if(i==j)
+                continue;
             glm::vec3 force(0, 0, 0);
-            glm::vec3 difference = pPos[i] - pPos[j];
+            glm::vec3 difference = glm::vec3(pPos[i]) - glm::vec3(pPos[j]);
 
             float distance = glm::length(difference);
             glm::vec3 differenceNormal = (difference / distance);
@@ -36,7 +38,7 @@ __global__ void update_step(glm::vec4 *pPos, Particles::Particles_cuda *particle
                 distance = distanceEpsilon;
             }
 
-            // Newtonian gravity (F_g = -G m_1 m_2 r^(-2) hat{n}), doubles are needed to prevent overflow, needs to be fixed in GPU implementation
+            // Newtonian gravity (F_g = -G m_1 m_2 r^(-2) hat{n})
             force -= differenceNormal * (float) ((double) G *
                                                  (((double) particles->mass[i] * (double) particles->mass[j]) /
                                                   ((double) (distance * distance))));
@@ -74,13 +76,14 @@ __global__ void update_step(glm::vec4 *pPos, Particles::Particles_cuda *particle
             }
 
             // Leapfrog integration (better than Euler for gravity simulations)
-            glm::vec4 newAcceleration = glm::vec4(force / particles->mass[i], 1); // a_i+1 = F_i+1 / m
+            glm::vec4 newAcceleration = glm::vec4(force / particles->mass[i], 0); // a_i+1 = F_i+1 / m
             pPos[i] += particles->velo[i] * timeStep +
                        particles->accel[i] * 0.5f * timeStep *
                        timeStep; // x_i+1 = v_i*dt + a_i*dt^2/2
             particles->velo[i] +=
                     (particles->accel[i] + newAcceleration) * 0.5f * timeStep; // v_i+1 = v_i + (a_i + a_i+1)dt/2
             particles->accel[i] = newAcceleration;
+            pPos[i].w = 1;
         }
     }
 }
@@ -91,10 +94,9 @@ void GravitySimGPU::updateStep(int numTimeSteps) {
     size_t size = numParticles * sizeof(glm::vec4);
     glm::vec4 *d_particles;
 
-    checkCudaErrors(cudaGraphicsMapResources(1, &vboParticlesPos_cuda));
-
+    checkCudaErrors(cudaGraphicsMapResources(1, &cudaParticlePositionBuffer));
     checkCudaErrors(cudaGraphicsResourceGetMappedPointer((void **) &d_particles,
-                                                         &size, vboParticlesPos_cuda));
+                                                         &size, cudaParticlePositionBuffer));
 
     int numberOfBlocks = (numParticles + BLOCK_SIZE - 1) / BLOCK_SIZE;
     // Update the position of the particles
@@ -104,11 +106,11 @@ void GravitySimGPU::updateStep(int numTimeSteps) {
         printf("Error: %s\n", cudaGetErrorString(err));
     cudaDeviceSynchronize();
     // Unmap the SSBO to be available to OpenGL
-    checkCudaErrors(cudaGraphicsUnmapResources(1, &vboParticlesPos_cuda));
+    checkCudaErrors(cudaGraphicsUnmapResources(1, &cudaParticlePositionBuffer));
 }
 
 GravitySimGPU::GravitySimGPU(Particles *particles, cudaGraphicsResource_t particlePos) :
-        vboParticlesPos_cuda(particlePos) {
+        cudaParticlePositionBuffer(particlePos) {
     numParticles = particles->numParticles;
     p_cuda = particles->to_cuda();
 }

@@ -11,7 +11,7 @@
 #include "Camera.hpp"
 #include "Model.hpp"
 
-class SphereRenderer : public Renderer_I {
+class DebugSphereRenderer : public Renderer_I {
 protected:
 
     Camera camera;
@@ -19,37 +19,25 @@ protected:
     ShaderProgram shaderProgram;
     Model sphereModel;
 
-    int numParticles;
-    GLuint vboParticlesPos{};
-
-    GLuint particleSSBOLocation;
-    GLuint particleSSBOBufferObject;
+    Particles* particles;
 
     float cameraAzimuthAngle;
     float cameraPolarAngle;
 
     void updateCamera(float frameTime);
 
-    float particleRadius;
-
 public:
     void init() override;
 
-    explicit SphereRenderer(int windowWidth, int windowHeight);
+    explicit DebugSphereRenderer(int windowWidth, int windowHeight, Particles* particles);
 
-    glm::vec4 *allocateParticlesAndInit_cpu(int numParticles, glm::vec4 *particlesPos) override;
-
+    glm::vec4* allocateParticlesAndInit_cpu(int numParticles, glm::vec4 *particlesPos) override;
     cudaGraphicsResource_t allocateParticlesAndInit_gpu(int numParticles, glm::vec4 *particlesPos) override;
 
     void render() override;
-
     void destroy() override;
 
     Camera_I *getCamera() override;
-
     InputHandler_I *getInputHandler() override;
-
-    void setParticleRadius(float radius);
-
 };
 

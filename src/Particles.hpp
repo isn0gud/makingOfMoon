@@ -23,7 +23,6 @@ public:
         shellDepthFraction = new GLfloat[numParticles];
         elasticSpringConstant = new GLfloat[numParticles];
         inelasticSpringForceReductionFactor = new GLfloat[numParticles];
-
     }
 
     typedef struct Particles_cuda {
@@ -132,7 +131,7 @@ public:
 
 
     void setParticleType(int particleNum, TYPE type, float radius,
-                         float massAdjustmentFactor) { //KARL_TODO: enter corrected values
+                         float massAdjustmentFactor) {
 //        this->radius[particleNum] = radius;
         this->radius[particleNum] = radius;
 
@@ -143,7 +142,7 @@ public:
                                                                pow(radius / (188.39 / DIST_SCALING), 3));
                 this->SDF[particleNum] = static_cast<GLfloat>(1 - 0.001);
 //                this->K[particleNum] = 2.9114E14; // TODO: Should probably scale with radius somehow
-                this->K[particleNum] = 2.9114E4; // TODO: Should probably scale with radius somehow
+                this->K[particleNum] = 2.9114E14; // TODO: Should probably scale with radius somehow
                 this->KRF[particleNum] = 0.01;
                 break;
             case Particles::TYPE::IRON:
@@ -151,7 +150,7 @@ public:
                                                                pow(radius / (188.39 / DIST_SCALING), 3));
                 this->SDF[particleNum] = static_cast<GLfloat>(1 - 0.002);
 //                this->K[particleNum] = 5.8228E14; // TODO: Should probably scale with radius somehow
-                this->K[particleNum] = 5.8228E4; // TODO: Should probably scale with radius somehow
+                this->K[particleNum] = 5.8228E14; // TODO: Should probably scale with radius somehow
                 this->KRF[particleNum] = 0.02;
                 break;
         }
@@ -176,7 +175,7 @@ public:
 
     void clear() {
         delete[] type;
-//        delete[] pos;
+        //delete[] pos;
         delete[] velo;
         delete[] accel;
         delete[] radius;

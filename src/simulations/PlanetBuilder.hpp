@@ -10,7 +10,6 @@ private:
     ~PlanetBuilder() {}
 
     static float randomFloatFromZeroToOne();
-
     static glm::vec3 sampleRandomPointInSphericalShell(float innerRadius, float outerRadius);
 
 public:

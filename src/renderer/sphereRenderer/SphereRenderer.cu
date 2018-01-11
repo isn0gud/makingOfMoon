@@ -26,8 +26,8 @@ void SphereRenderer::init() {
     glCullFace(GL_BACK);
 
     // Load shader
-    shaderProgram.source(GL_VERTEX_SHADER, "shaders/vertexShader.glsl");
-    shaderProgram.source(GL_FRAGMENT_SHADER, "shaders/fragmentShader.glsl");
+    shaderProgram.source(GL_VERTEX_SHADER, "shaders/sphereVertSSBO.glsl");
+    shaderProgram.source(GL_FRAGMENT_SHADER, "shaders/sphereFrag.glsl");
     shaderProgram.link();
     glUseProgram(shaderProgram.getId());
 
@@ -42,18 +42,21 @@ void SphereRenderer::init() {
 
 glm::vec4 *SphereRenderer::allocateParticlesAndInit_cpu(int numParticles, glm::vec4 *particlesPos)
 {
-    // SSBO allocation & data upload
-    glNamedBufferStorage(vboParticlesPos, numParticles * sizeof(glm::vec4), particlesPos,
-                         GL_MAP_WRITE_BIT | GL_MAP_READ_BIT | GL_MAP_PERSISTENT_BIT |
-                         GL_MAP_COHERENT_BIT); // Buffer storage is fixed size compared to BuferData
+    // SSBO allocation
+    particleSSBOLocation = glGetProgramResourceIndex(shaderProgram.getId(), GL_SHADER_STORAGE_BLOCK, "particles_ssbo");
+    glGenBuffers(1, &particleSSBOBufferObject);
+    glBindBufferBase(GL_SHADER_STORAGE_BUFFER, particleSSBOLocation, particleSSBOBufferObject);
+    //glNamedBufferData(particleSSBOBufferObject, numParticles * sizeof(glm::vec4), particlesPos, GL_DYNAMIC_DRAW);
+
+    glNamedBufferStorage(particleSSBOBufferObject, numParticles * sizeof(glm::vec4), particlesPos,
+                         GL_MAP_WRITE_BIT | GL_MAP_READ_BIT | GL_MAP_PERSISTENT_BIT | GL_MAP_PERSISTENT_BIT);
 
     //Mapping gpu memory to cpu memory for easy writes.
     glm::vec4 *particlePosPointer;
     this->numParticles = static_cast<size_t>(numParticles);
-    particlePosPointer = (glm::vec4 *) glMapNamedBufferRange(vboParticlesPos, 0, numParticles * sizeof(glm::vec4),
+    particlePosPointer = (glm::vec4 *) glMapNamedBufferRange(particleSSBOBufferObject, 0, numParticles * sizeof(glm::vec4),
                                                              GL_MAP_WRITE_BIT | GL_MAP_READ_BIT |
-                                                             GL_MAP_PERSISTENT_BIT |
-                                                             GL_MAP_COHERENT_BIT);
+                                                             GL_MAP_PERSISTENT_BIT | GL_MAP_PERSISTENT_BIT);
 
     if (!particlePosPointer) {
         GLenum error = glGetError();
@@ -123,6 +126,9 @@ void SphereRenderer::render() //const std::vector<Sphere *> &spheres, float fram
     GLint colorUniformLocation = glGetUniformLocation(shaderProgram.getId(), "inColor");
     glUniform4fv(colorUniformLocation, 1, glm::value_ptr(glm::vec4(0.8, 0.2, 0.2, 1.0)));
 
+    GLint radiusUniformLocation = glGetUniformLocation(shaderProgram.getId(), "radius");
+    glUniform1f(radiusUniformLocation, particleRadius);
+
     // Draw solid and then set the color to be slightly darker and draw wireframe
     sphereModel.drawSolidInstanced(numParticles);
     glUniform4fv(colorUniformLocation, 1, glm::value_ptr(glm::vec4(0.5, 0.0, 0.0, 1)));
@@ -141,6 +147,11 @@ Camera_I * SphereRenderer::getCamera()
 InputHandler_I * SphereRenderer::getInputHandler()
 {
     return &inputHandler;
+}
+
+void SphereRenderer::setParticleRadius(float radius)
+{
+    particleRadius = radius;
 }
 
 

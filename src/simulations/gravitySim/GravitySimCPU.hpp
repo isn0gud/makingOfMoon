@@ -5,6 +5,8 @@
 class GravitySimCPU : public ParticleSim_I {
 private:
     Particles *particles = nullptr;
+    std::vector<glm::vec3> forces;
+    // std::vector<glm::vec4> particlePositions; Opt for later...
 
 //    glm::vec3 getVelocityFromRotation(glm::vec3 angularVelocity, glm::vec3 position, glm::vec3 centerOfRotation);
 

@@ -8,7 +8,7 @@ class GravitySimGPU : ParticleSim_I {
 private:
     int numParticles;
     Particles::Particles_cuda *p_cuda;
-    cudaGraphicsResource_t vboParticlesPos_cuda;
+    cudaGraphicsResource_t cudaParticlePositionBuffer;
 
 public:
     GravitySimGPU(Particles *particles, cudaGraphicsResource_t particlePos);

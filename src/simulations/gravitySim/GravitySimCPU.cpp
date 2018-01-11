@@ -11,10 +11,11 @@ const float G = 6.674E-20;
 const float distanceEpsilon = 47.0975;
 
 void GravitySimCPU::updateStep(int numTimeSteps) {
+    if (forces.size() != particles->numParticles)
+        forces.resize(particles->numParticles);
+
     for (int step = 0; step < numTimeSteps; step++) {
-        std::vector<glm::vec3> forces;
-        if (forces.size() != particles->numParticles)
-            forces.resize(particles->numParticles);
+
         for (auto &force : forces)
             force = glm::vec3(0);
 
@@ -22,7 +23,7 @@ void GravitySimCPU::updateStep(int numTimeSteps) {
         for (int i = 0; i < particles->numParticles; i++) {
             for (int j = i + 1; j < particles->numParticles; j++) {
                 glm::vec3 force(0, 0, 0);
-                glm::vec3 difference = particles->pos[i] - particles->pos[j];
+                glm::vec3 difference = glm::vec3(particles->pos[i]) - glm::vec3(particles->pos[j]);
 
                 float distance = glm::length(difference);
                 glm::vec3 differenceNormal = (difference / distance);
@@ -85,6 +86,7 @@ void GravitySimCPU::updateStep(int numTimeSteps) {
             particles->velo[i] +=
                     (particles->accel[i] + newAcceleration) * 0.5f * timeStep; // v_i+1 = v_i + (a_i + a_i+1)dt/2
             particles->accel[i] = newAcceleration;
+            particles->pos[i].w = 1;
         }
     }
 }

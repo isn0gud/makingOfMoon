@@ -42,8 +42,8 @@
 #define NUM_PARTICLES 1000
 #define BLUR true
 
-#define MASS_SCALING 10E10f
-#define DIST_SCALING 10E3f
+#define MASS_SCALING 1.0f
+#define DIST_SCALING 1.0f
 
 typedef uint8_t BYTE;
 
