@@ -63,12 +63,23 @@ int main(int argc, char **argv) {
 
     //TODO change to constructor?
     renderer->init();
+    float planet1fracton = 0.5;
+    float planet2fracton = 0.5;
+    int num_planet1 = (int) (planet1fracton * NUM_PARTICLES);
+    int num_planet2 = (int) (planet2fracton * NUM_PARTICLES);
+    assert(num_planet1 + num_planet2 == NUM_PARTICLES);
+
     Particles *particles = new Particles(NUM_PARTICLES);
-    PlanetBuilder::buildPlanet(particles,
+    PlanetBuilder::buildPlanet(particles, 0, num_planet1,
                                Particles::TYPE::IRON, (1220.f * 0.25f) / DIST_SCALING,
                                Particles::TYPE::SILICATE, (6371.f * 0.25f) / DIST_SCALING,
             //glm::vec3(0), glm::vec3(0), glm::vec3(0, 7.2921159e-5, 0),
                                glm::vec3(0), glm::vec3(0, 0, 0), glm::vec3(0, 0, 0));
+    PlanetBuilder::buildPlanet(particles, num_planet1, num_planet2,
+                               Particles::TYPE::IRON, (1220.f * 0.25f) / DIST_SCALING,
+                               Particles::TYPE::SILICATE, (6371.f * 0.25f) / DIST_SCALING,
+            //glm::vec3(0), glm::vec3(0), glm::vec3(0, 7.2921159e-5, 0),
+                               glm::vec3(5000.0f / DIST_SCALING), glm::vec3(0, 0, 0), glm::vec3(0, 0, 0));
 
 
 //    particles->setParticlePos(renderer->allocateParticlesAndInit_cpu(NUM_PARTICLES, particles->pos));
@@ -90,7 +101,11 @@ int main(int argc, char **argv) {
     displayOpenGLInfo();
     Timer timer;
     timer.start();
-//    sim.updateStep(1);
+    for (int i = 0; i < particles->numParticles; ++i) {
+        particles->pos[i] += glm::vec4(particles->pos[i].x, particles->pos[i].y,
+                                       particles->pos[i].z, 1);
+        //TODO
+    }
 
     // Main loop
     while (!wm->shouldClose()) {
