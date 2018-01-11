@@ -32,8 +32,6 @@ int main(int argc, char **argv) {
 
     int WINDOW_WIDTH = 800;
     int WINDOW_HEIGHT = 600;
-//    int NUM_PARTICLES = 50 * 256;     ///< Number of particles simulated
-    int NUM_PARTICLES = 5000;
 
     // Open window
     WindowManager *wm = WindowManager::getInstance();
@@ -80,10 +78,10 @@ int main(int argc, char **argv) {
 //    RndTestSimGPU sim(particles, renderer->allocateParticlesAndInit_gpu(NUM_PARTICLES, particles->pos));
 
 
-//    ///CPU GRAVITY
+    ///CPU GRAVITY
     particles->setParticlePos(renderer->allocateParticlesAndInit_cpu(NUM_PARTICLES, particles->pos));
     GravitySimCPU sim(particles);
-//    ///\CPU
+    ///\CPU
 
 //    ///GPU GRAVITY
 //    GravitySimGPU sim(particles, renderer->allocateParticlesAndInit_gpu(NUM_PARTICLES, particles->pos));
@@ -101,10 +99,10 @@ int main(int argc, char **argv) {
             frameTime = MAX_FRAME_TIME;
 
         usleep(10000);
-//        if (windowInputHandler.runSimulation) {
+        if (windowInputHandler.runSimulation) {
             sim.updateStep(1);
-//            windowInputHandler.runSimulation = false;
-//        }
+            windowInputHandler.runSimulation = false;
+        }
 
 
         renderer->render();

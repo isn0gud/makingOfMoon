@@ -8,7 +8,7 @@ CameraRotateCenter::CameraRotateCenter(int windowWidth, int windowHeight) :
         windowHeight(windowHeight) {
     position.x = 0;
     position.y = PI / 4;
-    position.z = 60.0;
+    position.z = 600.0;
 }
 
 void CameraRotateCenter::applyInput() {
