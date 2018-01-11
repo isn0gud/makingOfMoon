@@ -66,24 +66,38 @@ int main(int argc, char **argv) {
 
     // Init GPU Simulation and print GPU info
     GravitySimGPU sim(particles, renderer->allocateParticlesAndInit_gpu(particles));
+
+    /* CPU */
+    //particles->setParticlePos(renderer->allocateParticlesAndInit_cpu(particles));
+    //GravitySimCPU sim(particles);
+
+
     displayOpenGLInfo();
 
     // Start timer
     Timer timer;
     timer.start();
 
+    double fpsAverage = 1;
+    double smoothing = 0.995;
+
     // Main loop
     while (!wm->shouldClose()) {
+
         float frameTime = timer.getFrameTime();
 
         if (windowInputHandler.singleStepSimulation || windowInputHandler.runSimulation) {
             sim.updateStep(1);
             windowInputHandler.singleStepSimulation = false;
+            fpsAverage = (fpsAverage * smoothing) + (((double) 1 / frameTime) * (1.0-smoothing));
         }
+
+        if(frameTime < 0.001)
+            usleep(900);
 
         renderer->render(frameTime);
         wm->swapBuffers();
-        wm->setTitle(windowTitle + " @" + std::to_string(1 / frameTime) + " fps");
+        wm->setTitle(windowTitle + " @" + std::to_string(1 / frameTime) + " fps, " + "Average: " + std::to_string(fpsAverage));
 
     }
 

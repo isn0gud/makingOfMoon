@@ -29,6 +29,6 @@
 #include <glm/vec3.hpp>
 #include <glm/vec4.hpp>
 
-#define NUM_PARTICLES 10000
+#define NUM_PARTICLES 9002
 
 
