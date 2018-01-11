@@ -131,19 +131,27 @@ public:
     GLfloat *&KRF = inelasticSpringForceReductionFactor;
 
 
-    void setParticleType(int particleNum, TYPE type, float radius, float massAdjustmentFactor) { //KARL_TODO: enter corrected values
+    void setParticleType(int particleNum, TYPE type, float radius,
+                         float massAdjustmentFactor) { //KARL_TODO: enter corrected values
+//        this->radius[particleNum] = radius;
         this->radius[particleNum] = radius;
+
         switch (type) {
             case Particles::TYPE::SILICATE:
-                this->mass[particleNum] = static_cast<GLfloat>(massAdjustmentFactor * 7.4161E19 * pow(radius / 188.39, 3));
+//                this->mass[particleNum] = static_cast<GLfloat>(massAdjustmentFactor * 7.4161E19 * pow(radius / 188.39, 3));
+                this->mass[particleNum] = static_cast<GLfloat>(massAdjustmentFactor * (7.4161E19 / MASS_SCALING) *
+                                                               pow(radius / (188.39 / DIST_SCALING), 3));
                 this->SDF[particleNum] = static_cast<GLfloat>(1 - 0.001);
-                this->K[particleNum] = 2.9114E14; // TODO: Should probably scale with radius somehow
+//                this->K[particleNum] = 2.9114E14; // TODO: Should probably scale with radius somehow
+                this->K[particleNum] = 2.9114E4; // TODO: Should probably scale with radius somehow
                 this->KRF[particleNum] = 0.01;
                 break;
             case Particles::TYPE::IRON:
-                this->mass[particleNum] = static_cast<GLfloat>(massAdjustmentFactor * 1.9549E20 * pow(radius / 188.39, 3));
+                this->mass[particleNum] = static_cast<GLfloat>(massAdjustmentFactor * (1.9549E20 / MASS_SCALING) *
+                                                               pow(radius / (188.39 / DIST_SCALING), 3));
                 this->SDF[particleNum] = static_cast<GLfloat>(1 - 0.002);
-                this->K[particleNum] = 5.8228E14; // TODO: Should probably scale with radius somehow
+//                this->K[particleNum] = 5.8228E14; // TODO: Should probably scale with radius somehow
+                this->K[particleNum] = 5.8228E4; // TODO: Should probably scale with radius somehow
                 this->KRF[particleNum] = 0.02;
                 break;
         }
@@ -168,7 +176,7 @@ public:
 
     void clear() {
         delete[] type;
-        delete[] pos;
+//        delete[] pos;
         delete[] velo;
         delete[] accel;
         delete[] radius;

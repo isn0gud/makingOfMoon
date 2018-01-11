@@ -39,8 +39,11 @@
 #define SIM_dt 0.005          ///< Simulation delta t
 #define MAX_ITER_PER_FRAME 4  ///< Simulation iterations per frame rendered
 #define DAMPING 0.999998        ///< Damping parameter for simulating 'soupy' galaxy (1.0 no damping)
-
+#define NUM_PARTICLES 100
 #define BLUR true
+
+#define MASS_SCALING 10E10f
+#define DIST_SCALING 10E2f
 
 typedef uint8_t BYTE;
 

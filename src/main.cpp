@@ -49,9 +49,11 @@ int main(int argc, char **argv) {
 //    glfwWindowHint(GLFW_BLUE_BITS, mode->blueBits);
 //    glfwWindowHint(GLFW_REFRESH_RATE, mode->refreshRate);
 //    glfwWindowHint(GLFW_RESIZABLE, GLFW_FALSE);
-    Renderer_I* renderer = new SphereRenderer(WINDOW_WIDTH, WINDOW_HEIGHT);
-    Camera_I* camera = renderer->getCamera();
-    InputHandler_I* inputHandler = renderer->getInputHandler();
+//    Renderer_I* renderer = new SphereRenderer(WINDOW_WIDTH, WINDOW_HEIGHT);
+    Renderer_I *renderer = new ParticleSpriteRenderer(WINDOW_WIDTH, WINDOW_HEIGHT);
+
+    Camera_I *camera = renderer->getCamera();
+    InputHandler_I *inputHandler = renderer->getInputHandler();
 
     WindowInputHandler windowInputHandler;
     wm->addKeyEventListener(&windowInputHandler);
@@ -65,24 +67,32 @@ int main(int argc, char **argv) {
     renderer->init();
     Particles *particles = new Particles(NUM_PARTICLES);
     PlanetBuilder::buildPlanet(particles,
-                               Particles::TYPE::IRON, 1220.f * 0.25f,
-                               Particles::TYPE::SILICATE, 6371.f * 0.25f,
+                               Particles::TYPE::IRON, (1220.f * 0.25f) / DIST_SCALING,
+                               Particles::TYPE::SILICATE, (6371.f * 0.25f) / DIST_SCALING,
             //glm::vec3(0), glm::vec3(0), glm::vec3(0, 7.2921159e-5, 0),
-                               glm::vec3(0), glm::vec3(0,0,0), glm::vec3(0, 0, 0));
+                               glm::vec3(0), glm::vec3(0, 0, 0), glm::vec3(0, 0, 0));
+
+
+//    particles->setParticlePos(renderer->allocateParticlesAndInit_cpu(NUM_PARTICLES, particles->pos));
+//    RndTestSimCPU sim(particles);
+
+
+//    RndTestSimGPU sim(particles, renderer->allocateParticlesAndInit_gpu(NUM_PARTICLES, particles->pos));
 
 
 //    ///CPU GRAVITY
-//    particles->setParticlePos(renderer.allocateParticlesAndInit_cpu(NUM_PARTICLES, particles->pos));
-//    GravitySimCPU sim(particles);
+    particles->setParticlePos(renderer->allocateParticlesAndInit_cpu(NUM_PARTICLES, particles->pos));
+    GravitySimCPU sim(particles);
 //    ///\CPU
 
-    ///GPU GRAVITY
-    GravitySimGPU sim(particles, renderer->allocateParticlesAndInit_gpu(NUM_PARTICLES, particles->pos));
-    ///\GPU
+//    ///GPU GRAVITY
+//    GravitySimGPU sim(particles, renderer->allocateParticlesAndInit_gpu(NUM_PARTICLES, particles->pos));
+//    ///\GPU
 
     displayOpenGLInfo();
     Timer timer;
     timer.start();
+//    sim.updateStep(1);
 
     // Main loop
     while (!wm->shouldClose()) {
@@ -91,8 +101,12 @@ int main(int argc, char **argv) {
             frameTime = MAX_FRAME_TIME;
 
         usleep(10000);
+//        if (windowInputHandler.runSimulation) {
+            sim.updateStep(1);
+//            windowInputHandler.runSimulation = false;
+//        }
 
-        sim.updateStep(1);
+
         renderer->render();
         wm->swapBuffers();
 

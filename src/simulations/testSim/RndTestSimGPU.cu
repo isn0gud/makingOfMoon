@@ -6,7 +6,7 @@
 
 __global__ void update(glm::vec4 *pPos) {
     int i = blockIdx.x * blockDim.x + threadIdx.x;
-    if (i < 3000) {
+    if (i < NUM_PARTICLES) {
         pPos[i] = pPos[i] + glm::vec4(0.01 * pPos[i].x, 0.01 * pPos[i].y,
                                       0.01 * pPos[i].z, 1);
 //        printf("test\n");
@@ -26,8 +26,9 @@ void RndTestSimGPU::updateStep(int numTimeSteps) {
 
 
     // Update the position of the particles
-    update << < 256, 256 >> > (d_particles);
+    update <<< 256, 256 >>> (d_particles);
 
+    checkCudaErrors(cudaDeviceSynchronize());
 
     // Unmap the SSBO to be available to OpenGL
     checkCudaErrors(cudaGraphicsUnmapResources(1, &vboParticlesPos_cuda));

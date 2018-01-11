@@ -20,7 +20,7 @@
 __global__ void update_step(glm::vec4 *pPos, Particles::Particles_cuda *particles) {
     int i = blockIdx.x * blockDim.x + threadIdx.x;
 
-    particles->numParticles = 5000; //TODO add numParticles as parameter
+    particles->numParticles = NUM_PARTICLES; //TODO add numParticles as parameter
     if (i < particles->numParticles) {
         //TODO add update steps
         for (int j = i + 1; j < particles->numParticles; j++) {

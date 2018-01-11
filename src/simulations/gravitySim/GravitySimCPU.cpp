@@ -1,4 +1,5 @@
 #include "GravitySimCPU.hpp"
+#include <cmath>
 
 #define timeStep 10.0f
 #define COLL_SPEED 1.5

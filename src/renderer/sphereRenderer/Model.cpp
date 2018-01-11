@@ -11,11 +11,6 @@ void Model::loadVertexData(std::vector<glm::vec3> vertices, GLint shader, std::s
 
     GLint vertexAttributeLocation = glGetAttribLocation(shader, vertexAttributeName.c_str());
 
-    if (glGenVertexArrays == NULL)
-    {
-        std::cout << "WTF!" << std::endl;
-    }
-
     glGenVertexArrays(1, &vertexArrayObjectId);
     glBindVertexArray(vertexArrayObjectId);
     glGenBuffers(1, &vertexBufferId);
