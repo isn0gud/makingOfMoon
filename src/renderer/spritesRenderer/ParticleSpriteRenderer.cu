@@ -5,6 +5,8 @@
 #include <cuda_gl_interop.h>
 #include "CameraRotateCenter.hpp"
 
+#define BLUR true
+
 
 const int FBO_MARGIN = 50;
 
@@ -164,7 +166,7 @@ void ParticleSpriteRenderer::setUniforms() {
 }
 
 
-void ParticleSpriteRenderer::render() {
+void ParticleSpriteRenderer::render(float frameTime) {
 
     camera->applyInput();
 
@@ -244,16 +246,16 @@ void ParticleSpriteRenderer::destroy() {
 
 }
 
-glm::vec4 *ParticleSpriteRenderer::allocateParticlesAndInit_cpu(int numParticles, glm::vec4 *particlesPos) {
+glm::vec4 *ParticleSpriteRenderer::allocateParticlesAndInit_cpu(Particles* particles) {
     // SSBO allocation & data upload
-    glNamedBufferStorage(vboParticlesPos, numParticles * sizeof(glm::vec4), particlesPos,
+    glNamedBufferStorage(vboParticlesPos, particles->numParticles * sizeof(glm::vec4), particles->pos,
                          GL_MAP_WRITE_BIT | GL_MAP_READ_BIT | GL_MAP_PERSISTENT_BIT |
                          GL_MAP_COHERENT_BIT); // Buffer storage is fixed size compared to BuferData
     //Mapping gpu memory to cpu memory for easy writes.
 
     glm::vec4 *particlePosPointer;
-    this->numParticles = static_cast<size_t>(numParticles);
-    particlePosPointer = (glm::vec4 *) glMapNamedBufferRange(vboParticlesPos, 0, numParticles * sizeof(glm::vec4),
+    this->numParticles = static_cast<size_t>(particles->numParticles);
+    particlePosPointer = (glm::vec4 *) glMapNamedBufferRange(vboParticlesPos, 0, particles->numParticles * sizeof(glm::vec4),
                                                              GL_MAP_WRITE_BIT | GL_MAP_READ_BIT |
                                                              GL_MAP_PERSISTENT_BIT |
                                                              GL_MAP_COHERENT_BIT);
@@ -267,12 +269,12 @@ glm::vec4 *ParticleSpriteRenderer::allocateParticlesAndInit_cpu(int numParticles
     }
 }
 
-cudaGraphicsResource_t ParticleSpriteRenderer::allocateParticlesAndInit_gpu(int numParticles, glm::vec4 *particlesPos) {
+cudaGraphicsResource_t ParticleSpriteRenderer::allocateParticlesAndInit_gpu(Particles* particles) {
     // SSBO allocation & data upload
-    glNamedBufferStorage(vboParticlesPos, numParticles * sizeof(glm::vec4), particlesPos,
+    glNamedBufferStorage(vboParticlesPos, particles->numParticles * sizeof(glm::vec4), particles->pos,
                          GL_MAP_WRITE_BIT | GL_MAP_READ_BIT | GL_MAP_PERSISTENT_BIT |
                          GL_MAP_COHERENT_BIT); // Buffer storage is fixed size compared to BuferData
-    this->numParticles = static_cast<size_t>(numParticles);
+    this->numParticles = static_cast<size_t>(particles->numParticles);
 
     cudaGraphicsResource_t vboParticlesPos_cuda;
     cudaGraphicsGLRegisterBuffer(&vboParticlesPos_cuda,

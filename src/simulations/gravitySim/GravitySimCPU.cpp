@@ -91,52 +91,6 @@ void GravitySimCPU::updateStep(int numTimeSteps) {
     }
 }
 
-//GravitySimCPU::GravitySimCPU() {
-//
-//
-//
-////    PlanetBuilder::buildPlanet(500,
-////                               Particles::TYPE::IRON, 1220.f * 0.25f,
-////                               Particles::TYPE::SILICATE, 6371.f * 0.25f,
-////            //glm::vec3(0), glm::vec3(0), glm::vec3(0, 7.2921159e-5, 0),
-////                               glm::vec3(0), glm::vec3(0), glm::vec3(0, 0, 0),
-////                               particles);
-//
-//    // Build planet at origin
-//
-////    int index = 0;
-////    for (int x = 0; x < CUBE_SIDE; x++) {
-////        for (int y = 0; y < CUBE_SIDE; y++) {
-////            for (int z = 0; z < CUBE_SIDE; z++) {
-////                particles.push_back(Particle::ironParticle(glm::vec3(
-////                        ((float) x - ((float) (CUBE_SIDE - 1) / 2.0f)) / 3.f,
-////                        ((float) y - ((float) (CUBE_SIDE - 1) / 2.0f)) / 3.f,
-////                        ((float) z - ((float) (CUBE_SIDE - 1) / 2.0f))  / 3.f)));
-////                particles[index]->velo += glm::cross(glm::vec3(0, 0, 0.25), particles[index]->pos);
-////                index++;
-////            }
-////        }
-////    }
-//
-//    // Build planet at to the right
-//
-////    for (int x = 0; x < CUBE_SIDE; x++) {
-////        for (int y = 0; y < CUBE_SIDE; y++) {
-////            for (int z = 0; z < CUBE_SIDE; z++) {
-////                particles.push_back(Particle::silicateParticle(
-////                        glm::vec3(
-////                                ((float) x - ((float) (CUBE_SIDE - 1) / 2.0f)) / 5.f + 3,
-////                                ((float) y - ((float) (CUBE_SIDE - 1) / 2.0f)) / 5.f,
-////                                ((float) z - ((float) (CUBE_SIDE - 1) / 2.0f)) / 5.f)));
-////                particles[index]->velo += glm::cross(glm::vec3(0, 0, -0.05),
-////                                                     particles[index]->pos - glm::vec3(3, 0, 0));
-////                index++;
-////            }
-////        }
-////    }
-//}
-
-
 GravitySimCPU::~GravitySimCPU() {
     // deletes all particles
     particles->clear();

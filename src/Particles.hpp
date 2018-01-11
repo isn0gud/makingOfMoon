@@ -25,9 +25,17 @@ public:
         inelasticSpringForceReductionFactor = new GLfloat[numParticles];
     }
 
+    static glm::vec3 getMaterialColor(Particles::TYPE materialType)
+    {
+        if(materialType == IRON)
+            return glm::vec3(0.85, 0.25, 0.25);
+        if(materialType == SILICATE)
+            return glm::vec3(0.75, 0.65, 0.35);
+        return glm::vec3(0,0,0);
+    }
+
     typedef struct Particles_cuda {
         TYPE *type;
-//        glm::vec4 *pos;
         glm::vec4 *velo;
         glm::vec4 *accel;
 
@@ -42,15 +50,12 @@ public:
 
     Particles_cuda *to_cuda() {
         TYPE *type;
-//        glm::vec4 *pos, *velo, *accel;
         glm::vec4 *velo, *accel;
 
         GLfloat *radius, *mass, *shellDepthFraction, *elasticSpringConstant, *inelasticSpringForceReductionFactor;
-//        int *_numParticles;
 
         // Allocate device data
         cudaMalloc((void **) &type, numParticles * sizeof(*type));
-//        cudaMalloc((void **) &pos, numParticles * sizeof(*pos));
         cudaMalloc((void **) &velo, numParticles * sizeof(*velo));
         cudaMalloc((void **) &accel, numParticles * sizeof(*accel));
         cudaMalloc((void **) &radius, numParticles * sizeof(*radius));
@@ -59,8 +64,6 @@ public:
         cudaMalloc((void **) &elasticSpringConstant, numParticles * sizeof(*elasticSpringConstant));
         cudaMalloc((void **) &inelasticSpringForceReductionFactor,
                    numParticles * sizeof(*inelasticSpringForceReductionFactor));
-//        cudaMalloc((void **) &_numParticles,
-//                   numParticles * sizeof(*_numParticles));
 
         // Allocate helper struct on the device
         Particles_cuda *p_cuda;
@@ -68,7 +71,6 @@ public:
 
         // Copy data from host to device
         cudaMemcpy(type, this->type, numParticles * sizeof(*type), cudaMemcpyHostToDevice);
-//        cudaMemcpy(pos, this->pos, numParticles * sizeof(*pos), cudaMemcpyHostToDevice);
         cudaMemcpy(velo, this->velo, numParticles * sizeof(*velo), cudaMemcpyHostToDevice);
         cudaMemcpy(accel, this->accel, numParticles * sizeof(*accel), cudaMemcpyHostToDevice);
         cudaMemcpy(radius, this->radius, numParticles * sizeof(*radius), cudaMemcpyHostToDevice);
@@ -79,12 +81,9 @@ public:
                    cudaMemcpyHostToDevice);
         cudaMemcpy(inelasticSpringForceReductionFactor, this->inelasticSpringForceReductionFactor,
                    numParticles * sizeof(*inelasticSpringForceReductionFactor), cudaMemcpyHostToDevice);
-//        cudaMemcpy(_numParticles, (int*) &numParticles,
-//                   numParticles * sizeof(*_numParticles), cudaMemcpyHostToDevice);
 
         // NOTE: Binding pointers with p_cuda
         cudaMemcpy(&(p_cuda->type), &type, sizeof(p_cuda->type), cudaMemcpyHostToDevice);
-//        cudaMemcpy(&(p_cuda->pos), &pos, sizeof(p_cuda->pos), cudaMemcpyHostToDevice);
         cudaMemcpy(&(p_cuda->velo), &velo, sizeof(p_cuda->velo), cudaMemcpyHostToDevice);
         cudaMemcpy(&(p_cuda->accel), &accel, sizeof(p_cuda->accel), cudaMemcpyHostToDevice);
         cudaMemcpy(&(p_cuda->radius), &radius, sizeof(p_cuda->radius), cudaMemcpyHostToDevice);
@@ -95,19 +94,14 @@ public:
                    cudaMemcpyHostToDevice);
         cudaMemcpy(&(p_cuda->inelasticSpringForceReductionFactor), &inelasticSpringForceReductionFactor,
                    sizeof(p_cuda->inelasticSpringForceReductionFactor), cudaMemcpyHostToDevice);
-//        cudaMemcpy(&(p_cuda->numParticles), &_numParticles,
-//                   sizeof(p_cuda->numParticles), cudaMemcpyHostToDevice);
+
         return p_cuda;
     }
 
-
     int numParticles = 0;
-
 
     TYPE *type = nullptr;
 
-    /// can't use a std::vector, since the gl buffer mapping to cpu space gives an allocated pointer already,
-    /// which has to be used.
     //unit: km
     glm::vec4 *pos = nullptr;
     //unit: km/s
@@ -134,22 +128,20 @@ public:
                          float massAdjustmentFactor) {
 //        this->radius[particleNum] = radius;
         this->radius[particleNum] = radius;
+        this->type[particleNum] = type;
 
         switch (type) {
             case Particles::TYPE::SILICATE:
-//                this->mass[particleNum] = static_cast<GLfloat>(massAdjustmentFactor * 7.4161E19 * pow(radius / 188.39, 3));
-                this->mass[particleNum] = static_cast<GLfloat>(massAdjustmentFactor * (7.4161E19 / MASS_SCALING) *
-                                                               pow(radius / (188.39 / DIST_SCALING), 3));
+                this->mass[particleNum] = static_cast<GLfloat>(massAdjustmentFactor * (7.4161E19) *
+                                                               pow(radius / (188.39), 3));
                 this->SDF[particleNum] = static_cast<GLfloat>(1 - 0.001);
-//                this->K[particleNum] = 2.9114E14; // TODO: Should probably scale with radius somehow
                 this->K[particleNum] = 2.9114E14; // TODO: Should probably scale with radius somehow
                 this->KRF[particleNum] = 0.01;
                 break;
             case Particles::TYPE::IRON:
-                this->mass[particleNum] = static_cast<GLfloat>(massAdjustmentFactor * (1.9549E20 / MASS_SCALING) *
-                                                               pow(radius / (188.39 / DIST_SCALING), 3));
+                this->mass[particleNum] = static_cast<GLfloat>(massAdjustmentFactor * (1.9549E20) *
+                                                               pow(radius / (188.39), 3));
                 this->SDF[particleNum] = static_cast<GLfloat>(1 - 0.002);
-//                this->K[particleNum] = 5.8228E14; // TODO: Should probably scale with radius somehow
                 this->K[particleNum] = 5.8228E14; // TODO: Should probably scale with radius somehow
                 this->KRF[particleNum] = 0.02;
                 break;
@@ -175,14 +167,12 @@ public:
 
     void clear() {
         delete[] type;
-        //delete[] pos;
         delete[] velo;
         delete[] accel;
         delete[] radius;
         delete[] shellDepthFraction;
         delete[] elasticSpringConstant;
         delete[] inelasticSpringForceReductionFactor;
-
     }
 
 };

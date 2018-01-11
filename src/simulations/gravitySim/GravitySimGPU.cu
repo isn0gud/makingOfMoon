@@ -6,7 +6,7 @@
 #include "vector_types.h"
 #include "../../util/helper_cuda.h"
 
-#define timeStep 1.0f
+#define timeStep 10.0f
 #define COLL_SPEED 1.5
 #define CUBE_SIDE 5
 
@@ -20,13 +20,13 @@
 __global__ void update_step(glm::vec4 *pPos, Particles::Particles_cuda *particles) {
     int i = blockIdx.x * blockDim.x + threadIdx.x;
 
-    particles->numParticles = NUM_PARTICLES; //TODO add numParticles as parameter
+    particles->numParticles = NUM_PARTICLES;
     if (i < particles->numParticles) {
-        //TODO add update steps
+        glm::vec3 force(0, 0, 0);
         for (int j = 0; j < particles->numParticles; j++) {
             if(i==j)
                 continue;
-            glm::vec3 force(0, 0, 0);
+
             glm::vec3 difference = glm::vec3(pPos[i]) - glm::vec3(pPos[j]);
 
             float distance = glm::length(difference);
@@ -74,20 +74,20 @@ __global__ void update_step(glm::vec4 *pPos, Particles::Particles_cuda *particle
                           (particles->radius[i] + particles->radius[j]) -
                           distance * distance);
             }
-
-            // Leapfrog integration (better than Euler for gravity simulations)
-            glm::vec4 newAcceleration = glm::vec4(force / particles->mass[i], 0); // a_i+1 = F_i+1 / m
-            pPos[i] += particles->velo[i] * timeStep +
-                       particles->accel[i] * 0.5f * timeStep *
-                       timeStep; // x_i+1 = v_i*dt + a_i*dt^2/2
-            particles->velo[i] +=
-                    (particles->accel[i] + newAcceleration) * 0.5f * timeStep; // v_i+1 = v_i + (a_i + a_i+1)dt/2
-            particles->accel[i] = newAcceleration;
-            pPos[i].w = 1;
         }
+
+        // Leapfrog integration (better than Euler for gravity simulations)
+        glm::vec4 newAcceleration = glm::vec4(force / particles->mass[i], 0); // a_i+1 = F_i+1 / m
+
+        pPos[i] += particles->velo[i] * timeStep +
+                   particles->accel[i] * 0.5f * timeStep *
+                   timeStep; // x_i+1 = v_i*dt + a_i*dt^2/2
+        particles->velo[i] +=
+                (particles->accel[i] + newAcceleration) * 0.5f * timeStep; // v_i+1 = v_i + (a_i + a_i+1)dt/2
+        particles->accel[i] = newAcceleration;
+        pPos[i].w = 1;
     }
 }
-
 
 void GravitySimGPU::updateStep(int numTimeSteps) {
 

@@ -16,15 +16,13 @@ class ParticleSpriteRenderer : public Renderer_I {
 public:
     void init() override;
 
-
     explicit ParticleSpriteRenderer(int windowWidth, int windowHeight);
 
-    glm::vec4 *allocateParticlesAndInit_cpu(int numParticles, glm::vec4 *particlesPos) override;
+    glm::vec4 *allocateParticlesAndInit_cpu(Particles* particles) override;
 
-    cudaGraphicsResource_t allocateParticlesAndInit_gpu(int numParticles, glm::vec4 *particlesPos) override;
+    cudaGraphicsResource_t allocateParticlesAndInit_gpu(Particles* particles) override;
 
-
-    void render() override;
+    void render(float frameTime) override;
 
     void destroy() override;
 

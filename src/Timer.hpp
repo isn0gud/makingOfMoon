@@ -10,9 +10,7 @@ public:
     Timer() {}
 
     void start();
-
     float getTimeSinceStart();
-
     float getFrameTime();
 
 };

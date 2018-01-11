@@ -1,5 +1,4 @@
 #include "Camera.hpp"
-
 #include "glm/gtc/matrix_inverse.hpp"
 
 Camera::Camera()
@@ -23,6 +22,7 @@ void Camera:: updateWindowShape(float width, float height)
 {
     aspectRatio = width / height;
     projectionMatrix = glm::perspective(fieldOfView, aspectRatio, near, far);
+    glViewport(0, 0, width, height);
 }
 
 void Camera::setFrustrum(float fov, float near, float far)

@@ -27,7 +27,6 @@ void ShaderProgram::source(GLenum shader_type, const std::string &filename) { //
 
     GLint success;
     GLchar info_log[2048];
-
     const char *shader_data = code.c_str();
 
     // OpenGL stuff

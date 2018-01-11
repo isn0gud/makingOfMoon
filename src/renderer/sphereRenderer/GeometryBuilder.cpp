@@ -8,6 +8,9 @@ void GeometryBuilder::buildSphere(int nSections, float radius, std::vector<glm::
     outVertices.resize(3 * nSections * nSections);
     for (int i = 0; i < nSections / 2; i++) {
         for (int j = 0; j < nSections; j++) {
+
+            // Construct a sphere from a grid of points in spherical coordinates
+
             int index = 6 * (i * nSections + j);
             float polarAngle1 = PI * (((float) i) / ((float) nSections / 2));
             float azimuthAngle1 = 2 * PI * ((float) j) / ((float) nSections);

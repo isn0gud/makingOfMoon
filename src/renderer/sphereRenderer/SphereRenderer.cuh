@@ -13,21 +13,16 @@
 
 class SphereRenderer : public Renderer_I {
 protected:
-
     Camera camera;
     SphereRendererInputHandler inputHandler;
     ShaderProgram shaderProgram;
     Model sphereModel;
 
     int numParticles;
-    GLuint vboParticlesPos{};
-
-    GLuint particleSSBOLocation;
-    GLuint particleSSBOBufferObject;
-
     float cameraAzimuthAngle;
     float cameraPolarAngle;
 
+    void fillAttributeSSBO(Particles* particles);
     void updateCamera(float frameTime);
 
     float particleRadius;
@@ -37,19 +32,15 @@ public:
 
     explicit SphereRenderer(int windowWidth, int windowHeight);
 
-    glm::vec4 *allocateParticlesAndInit_cpu(int numParticles, glm::vec4 *particlesPos) override;
+    glm::vec4 *allocateParticlesAndInit_cpu(Particles* particles) override;
+    cudaGraphicsResource_t allocateParticlesAndInit_gpu(Particles* particles) override;
 
-    cudaGraphicsResource_t allocateParticlesAndInit_gpu(int numParticles, glm::vec4 *particlesPos) override;
-
-    void render() override;
+    void render(float frameTime) override;
 
     void destroy() override;
 
     Camera_I *getCamera() override;
 
     InputHandler_I *getInputHandler() override;
-
-    void setParticleRadius(float radius);
-
 };
 

@@ -15,7 +15,6 @@ SphereRenderer::SphereRenderer(int windowWidth, int windowHeight)
     camera.setProjectionMatrix(45.0f, windowWidth, windowHeight, 1.0f, 100000.0f);
     camera.position = glm::vec3(0, 0, 15000);
     camera.setOrientation(glm::vec3(0, 0, -1), glm::vec3(0, 1, 0));
-
 }
 
 void SphereRenderer::init() {
@@ -40,21 +39,41 @@ void SphereRenderer::init() {
     cameraPolarAngle = 0;
 }
 
-glm::vec4 *SphereRenderer::allocateParticlesAndInit_cpu(int numParticles, glm::vec4 *particlesPos)
+void SphereRenderer::fillAttributeSSBO(Particles *particles)
 {
-    // SSBO allocation
-    particleSSBOLocation = glGetProgramResourceIndex(shaderProgram.getId(), GL_SHADER_STORAGE_BLOCK, "particles_ssbo");
-    glGenBuffers(1, &particleSSBOBufferObject);
-    glBindBufferBase(GL_SHADER_STORAGE_BUFFER, particleSSBOLocation, particleSSBOBufferObject);
-    //glNamedBufferData(particleSSBOBufferObject, numParticles * sizeof(glm::vec4), particlesPos, GL_DYNAMIC_DRAW);
+    glm::vec4* attributeArray = new glm::vec4[particles->numParticles];
+    for(int i = 0; i < particles->numParticles; i++)
+    {
+        glm::vec3 color = Particles::getMaterialColor(particles->type[i]);
+        attributeArray[i] = glm::vec4(color.x, color.y, color.z, particles->radius[i]);
+    }
 
-    glNamedBufferStorage(particleSSBOBufferObject, numParticles * sizeof(glm::vec4), particlesPos,
+    GLuint particleAttributeSSBOLocation = 2; // Hard-coded in shader
+    GLuint particleAttributeSSBOBufferObject;
+    glGenBuffers(1, &particleAttributeSSBOBufferObject);
+    glBindBufferBase(GL_SHADER_STORAGE_BUFFER, particleAttributeSSBOLocation, particleAttributeSSBOBufferObject);
+    glBufferData(GL_SHADER_STORAGE_BUFFER, particles->numParticles * sizeof(glm::vec4), attributeArray, GL_STATIC_DRAW);
+    glBindBuffer(GL_SHADER_STORAGE_BUFFER, 0);
+
+    delete [] attributeArray;
+}
+
+glm::vec4 *SphereRenderer::allocateParticlesAndInit_cpu(Particles* particles)
+{
+    fillAttributeSSBO(particles);
+
+    // SSBO allocation
+    GLuint particlePositionSSBOLocation = 1; // // Hard-coded in shader
+    GLuint particlePositionSSBOBufferObject;
+    glGenBuffers(1, &particlePositionSSBOBufferObject);
+    glBindBufferBase(GL_SHADER_STORAGE_BUFFER, particlePositionSSBOLocation, particlePositionSSBOBufferObject);
+    glNamedBufferStorage(particlePositionSSBOBufferObject, particles->numParticles * sizeof(glm::vec4), particles->pos,
                          GL_MAP_WRITE_BIT | GL_MAP_READ_BIT | GL_MAP_PERSISTENT_BIT | GL_MAP_PERSISTENT_BIT);
 
     //Mapping gpu memory to cpu memory for easy writes.
     glm::vec4 *particlePosPointer;
-    this->numParticles = static_cast<size_t>(numParticles);
-    particlePosPointer = (glm::vec4 *) glMapNamedBufferRange(particleSSBOBufferObject, 0, numParticles * sizeof(glm::vec4),
+    this->numParticles = static_cast<size_t>(particles->numParticles);
+    particlePosPointer = (glm::vec4 *) glMapNamedBufferRange(particlePositionSSBOBufferObject, 0, particles->numParticles * sizeof(glm::vec4),
                                                              GL_MAP_WRITE_BIT | GL_MAP_READ_BIT |
                                                              GL_MAP_PERSISTENT_BIT | GL_MAP_PERSISTENT_BIT);
 
@@ -67,23 +86,21 @@ glm::vec4 *SphereRenderer::allocateParticlesAndInit_cpu(int numParticles, glm::v
     }
 }
 
-cudaGraphicsResource_t SphereRenderer::allocateParticlesAndInit_gpu(int numParticles, glm::vec4 *particlesPos)
+cudaGraphicsResource_t SphereRenderer::allocateParticlesAndInit_gpu(Particles* particles)
 {
-    // SSBO allocation & data upload
-    /*glNamedBufferStorage(vboParticlesPos, numParticles * sizeof(glm::vec4), particlesPos,
-                         GL_MAP_WRITE_BIT | GL_MAP_READ_BIT | GL_MAP_PERSISTENT_BIT |
-                         GL_MAP_COHERENT_BIT);*/ // Buffer storage is fixed size compared to BuferData
-    this->numParticles = static_cast<size_t>(numParticles);
+    fillAttributeSSBO(particles);
 
-    particleSSBOLocation = glGetProgramResourceIndex(shaderProgram.getId(), GL_SHADER_STORAGE_BLOCK, "particles_ssbo");
-    glGenBuffers(1, &particleSSBOBufferObject);
-    glBindBufferBase(GL_SHADER_STORAGE_BUFFER, particleSSBOLocation, particleSSBOBufferObject);
-    glBufferData(GL_SHADER_STORAGE_BUFFER, numParticles * sizeof(glm::vec4), particlesPos, GL_DYNAMIC_DRAW);
+    this->numParticles = static_cast<size_t>(particles->numParticles);
+    GLuint particlePositionSSBOLocation = 1; // Hard-coded in shader
+    GLuint particlePositionSSBOBufferObject;
+    glGenBuffers(1, &particlePositionSSBOBufferObject);
+    glBindBufferBase(GL_SHADER_STORAGE_BUFFER, particlePositionSSBOLocation, particlePositionSSBOBufferObject);
+    glBufferData(GL_SHADER_STORAGE_BUFFER, numParticles * sizeof(glm::vec4), particles->pos, GL_DYNAMIC_DRAW);
     glBindBuffer(GL_SHADER_STORAGE_BUFFER, 0);
 
     cudaGraphicsResource_t vboParticlesPos_cuda;
     cudaGraphicsGLRegisterBuffer(&vboParticlesPos_cuda,
-                                 particleSSBOBufferObject,
+                                 particlePositionSSBOBufferObject,
                                  cudaGraphicsRegisterFlagsNone);
     return vboParticlesPos_cuda;
 }
@@ -108,30 +125,26 @@ void SphereRenderer::updateCamera(float frameTime) {
     camera.setOrientation(cameraForwardVector, glm::vec3(0, 1, 0));
 }
 
-void SphereRenderer::render() //const std::vector<Sphere *> &spheres, float frameTime
+void SphereRenderer::render(float frameTime)
 {
     // Update
-    updateCamera(0.01f); // TODO: provide frame time...
+    updateCamera(frameTime);
 
     // Draw
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
+    // Set Model-View-Projection Matrix
     GLint MVPUniformLocation = glGetUniformLocation(shaderProgram.getId(), "mvp");
     glm::mat4 viewProjectionMatrix = camera.getViewProjectionMatrix();
     glUniformMatrix4fv(MVPUniformLocation, 1, GL_FALSE, glm::value_ptr(viewProjectionMatrix));
 
-    // TODO: Set color and radius in shader from particle type (OGL needs access to particle pos, type and radius. In case of time pressure, the latter two can be faked by hard-coding the shader)
     // Set color
-
     GLint colorUniformLocation = glGetUniformLocation(shaderProgram.getId(), "inColor");
-    glUniform4fv(colorUniformLocation, 1, glm::value_ptr(glm::vec4(0.8, 0.2, 0.2, 1.0)));
-
-    GLint radiusUniformLocation = glGetUniformLocation(shaderProgram.getId(), "radius");
-    glUniform1f(radiusUniformLocation, particleRadius);
+    glUniform4fv(colorUniformLocation, 1, glm::value_ptr(glm::vec4(0.0, 0.0, 0.0, 0.0)));
 
     // Draw solid and then set the color to be slightly darker and draw wireframe
     sphereModel.drawSolidInstanced(numParticles);
-    glUniform4fv(colorUniformLocation, 1, glm::value_ptr(glm::vec4(0.5, 0.0, 0.0, 1)));
+    glUniform4fv(colorUniformLocation, 1, glm::value_ptr(glm::vec4(0.25, 0.25, 0.25, 0)));
     sphereModel.drawWireframeInstanced(numParticles);
 }
 
@@ -149,10 +162,6 @@ InputHandler_I * SphereRenderer::getInputHandler()
     return &inputHandler;
 }
 
-void SphereRenderer::setParticleRadius(float radius)
-{
-    particleRadius = radius;
-}
 
 
 

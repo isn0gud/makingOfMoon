@@ -1,24 +1,17 @@
 #include <iostream>
+#include <thread>
 
 #include "WindowInputHandler.hpp"
-//#include "renderer/spritesRenderer/ParticleSpriteRenderer.cuh"
-//#include "renderer/spritesRenderer/InputHandler.hpp"
+#include "Timer.hpp"
+
 #include "renderer/spritesRenderer/ParticleSpriteRenderer.cuh"
 #include "renderer/spritesRenderer/SpriteRendererInputHandler.hpp"
 #include "renderer/sphereRenderer/SphereRenderer.cuh"
-#include "Timer.hpp"
 
-#include <thread>
-
-#include "simulations/testSim/RndTestSimCPU.hpp"
-#include "simulations/testSim/RndTestSimGPU.cuh"
-
+#include "simulations/PlanetBuilder.hpp"
 #include "simulations/gravitySim/GravitySimCPU.hpp"
 #include "simulations/gravitySim/GravitySimGPU.cuh"
 
-#define MAX_FRAME_TIME 0.1f
-
-//
 void displayOpenGLInfo() {
     // Display information about the GPU and OpenGL version
     printf("OpenGL %s\n", glewGetString(GLEW_VERSION));
@@ -38,21 +31,12 @@ int main(int argc, char **argv) {
     std::string windowTitle = "AGP Project - The Making of the Moon";
     wm->open(WINDOW_WIDTH, WINDOW_HEIGHT, windowTitle, true);
 
-//    GLFWmonitor *monitor = glfwGetPrimaryMonitor();
-//
-//    const GLFWvidmode *mode = glfwGetVideoMode(monitor);
-//
-//    glfwWindowHint(GLFW_RED_BITS, mode->redBits);
-//    glfwWindowHint(GLFW_GREEN_BITS, mode->greenBits);
-//    glfwWindowHint(GLFW_BLUE_BITS, mode->blueBits);
-//    glfwWindowHint(GLFW_REFRESH_RATE, mode->refreshRate);
-//    glfwWindowHint(GLFW_RESIZABLE, GLFW_FALSE);
-//    Renderer_I* renderer = new SphereRenderer(WINDOW_WIDTH, WINDOW_HEIGHT);
+    // Create renderer
     Renderer_I *renderer = new SphereRenderer(WINDOW_WIDTH, WINDOW_HEIGHT);
 
+    // Bind event listeners
     Camera_I *camera = renderer->getCamera();
     InputHandler_I *inputHandler = renderer->getInputHandler();
-
     WindowInputHandler windowInputHandler;
     wm->addKeyEventListener(&windowInputHandler);
     wm->addWindowEventListener(camera);
@@ -61,8 +45,9 @@ int main(int argc, char **argv) {
     wm->addCursorPositionListener(inputHandler);
     wm->addMouseButtonEventListener(inputHandler);
 
-    //TODO change to constructor?
     renderer->init();
+
+    // Build Scene
     float planet1fracton = 0.5;
     float planet2fracton = 0.5;
     int num_planet1 = (int) (planet1fracton * NUM_PARTICLES);
@@ -71,34 +56,19 @@ int main(int argc, char **argv) {
 
     Particles *particles = new Particles(NUM_PARTICLES);
     PlanetBuilder::buildPlanet(particles, 0, num_planet1,
-                               Particles::TYPE::IRON, 1220.f,
+                               Particles::TYPE::IRON, 3400.f,
                                Particles::TYPE::SILICATE, 6371.f,
-                               glm::vec3(0), glm::vec3(0, 0, 0), glm::vec3(0, 0, 0));
+                               glm::vec3(0), glm::vec3(0, 0, 0), glm::vec3(0, 7.2921159e-5, 0));
     PlanetBuilder::buildPlanet(particles, num_planet1, num_planet2,
-                               Particles::TYPE::IRON, 1220.f,
+                               Particles::TYPE::IRON, 3400.f,
                                Particles::TYPE::SILICATE, 6371.f,
-                               glm::vec3(20000.0f, 0, 0), glm::vec3(0, 0, 0), glm::vec3(0, 0, 0));
+                               glm::vec3(20000.0f, 0, 0), glm::vec3(-50, 0, -20), glm::vec3(0, 0, 0));
 
-    /// SPHERE RENDER (really smelly code, fix if we have time!!!)
-    ((SphereRenderer*)renderer)->setParticleRadius(particles->radius[0]);
-
-//    particles->setParticlePos(renderer->allocateParticlesAndInit_cpu(NUM_PARTICLES, particles->pos));
-//    RndTestSimCPU sim(particles);
-
-//    RndTestSimGPU sim(particles, renderer->allocateParticlesAndInit_gpu(NUM_PARTICLES, particles->pos));
-
-    ///CPU GRAVITY
-    //particles->setParticlePos(renderer->allocateParticlesAndInit_cpu(NUM_PARTICLES, particles->pos));
-
-    //GravitySimCPU sim(particles);
-    ///\CPU
-
-//    ///GPU GRAVITY
-      ((SphereRenderer*)renderer)->setParticleRadius(particles->radius[0]);
-      GravitySimGPU sim(particles, renderer->allocateParticlesAndInit_gpu(NUM_PARTICLES, particles->pos));
-//    ///\GPU
-
+    // Init GPU Simulation and print GPU info
+    GravitySimGPU sim(particles, renderer->allocateParticlesAndInit_gpu(particles));
     displayOpenGLInfo();
+
+    // Start timer
     Timer timer;
     timer.start();
 
@@ -106,16 +76,18 @@ int main(int argc, char **argv) {
     while (!wm->shouldClose()) {
         float frameTime = timer.getFrameTime();
 
-        if (windowInputHandler.runSimulation) {
+        if (windowInputHandler.singleStepSimulation || windowInputHandler.runSimulation) {
             sim.updateStep(1);
-            windowInputHandler.runSimulation = true;
+            windowInputHandler.singleStepSimulation = false;
         }
 
-        renderer->render();
+        renderer->render(frameTime);
         wm->swapBuffers();
         wm->setTitle(windowTitle + " @" + std::to_string(1 / frameTime) + " fps");
 
     }
+
+    // Clean up
     renderer->destroy();
     wm->close();
     return 0;

@@ -1,15 +1,23 @@
 #version 450 core
 
-layout (location = 0) in vec3 aPos;
+in vec3 aPos;
+out flat uint instanceId;
 
-buffer particles_ssbo
+layout(binding = 1) buffer particle_position_ssbo
 {
     vec4 pos[];
-};
+} posBuff;
+
+
+layout(binding = 2) buffer particle_attribute_ssbo
+{
+    // Stores color and radius as a vector: color = (red, green, blue, radius) 
+    vec4 attrib[]; 
+} attribBuff;
 
 uniform mat4 mvp;
-uniform float radius;
 
 void main() {
-    gl_Position = mvp * (pos[gl_InstanceID] + vec4(radius*aPos, 1));
+    instanceId = gl_InstanceID;
+    gl_Position = mvp * (posBuff.pos[gl_InstanceID] + vec4(attribBuff.attrib[gl_InstanceID].w * aPos, 1));
 }
