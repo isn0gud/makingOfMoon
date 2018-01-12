@@ -2,6 +2,7 @@
 
 #include "../common.hpp"
 #include "../Particles.hpp"
+#include <vector>
 
 class PlanetBuilder {
 private:
@@ -10,12 +11,15 @@ private:
     ~PlanetBuilder() {}
 
     static float randomFloatFromZeroToOne();
+
     static glm::vec3 sampleRandomPointInSphericalShell(float innerRadius, float outerRadius);
 
 public:
-    static void buildPlanet(Particles *particles, int startIdx, int numParticlesInPlanet, Particles::TYPE coreType,
-                            float coreRadius,
-                            Particles::TYPE outerLayerType, float radius, glm::vec3 position, glm::vec3 velocity,
-                            glm::vec3 angularVelocity);
+    static Particles::ParticlesInit buildPlanet( int numParticlesInPlanet, TYPE coreType,
+                           float coreRadius,
+                           TYPE outerLayerType, float radius, glm::vec3 position, glm::vec3 velocity,
+                           glm::vec3 angularVelocity);
+
+
 };
 

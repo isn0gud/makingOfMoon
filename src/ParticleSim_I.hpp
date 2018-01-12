@@ -1,6 +1,5 @@
 #pragma once
 
-#include "Particles.hpp"
 #include "common.hpp"
 
 class ParticleSim_I {

@@ -6,7 +6,7 @@
 
 __global__ void update(glm::vec4 *pPos) {
     int i = blockIdx.x * blockDim.x + threadIdx.x;
-    if (i < NUM_PARTICLES) {
+    if (i < 100) {
         pPos[i] = pPos[i] + glm::vec4(0.01 * pPos[i].x, 0.01 * pPos[i].y,
                                       0.01 * pPos[i].z, 1);
 //        printf("test\n");

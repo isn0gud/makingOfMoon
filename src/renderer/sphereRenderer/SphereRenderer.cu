@@ -45,7 +45,7 @@ void SphereRenderer::fillAttributeSSBO(Particles *particles)
     for(int i = 0; i < particles->numParticles; i++)
     {
         glm::vec3 color = Particles::getMaterialColor(particles->type[i]);
-        attributeArray[i] = glm::vec4(color.x, color.y, color.z, particles->radius[i]);
+        attributeArray[i] = glm::vec4(color.x, color.y, color.z, particles->pos__radius[i].w);
     }
 
     GLuint particleAttributeSSBOLocation = 2; // Hard-coded in shader
@@ -67,7 +67,7 @@ glm::vec4 *SphereRenderer::allocateParticlesAndInit_cpu(Particles* particles)
     GLuint particlePositionSSBOBufferObject;
     glGenBuffers(1, &particlePositionSSBOBufferObject);
     glBindBufferBase(GL_SHADER_STORAGE_BUFFER, particlePositionSSBOLocation, particlePositionSSBOBufferObject);
-    glNamedBufferStorage(particlePositionSSBOBufferObject, particles->numParticles * sizeof(glm::vec4), particles->pos,
+    glNamedBufferStorage(particlePositionSSBOBufferObject, particles->numParticles * sizeof(glm::vec4), particles->pos__radius,
                          GL_MAP_WRITE_BIT | GL_MAP_READ_BIT | GL_MAP_PERSISTENT_BIT | GL_MAP_PERSISTENT_BIT);
 
     //Mapping gpu memory to cpu memory for easy writes.
@@ -95,7 +95,7 @@ cudaGraphicsResource_t SphereRenderer::allocateParticlesAndInit_gpu(Particles* p
     GLuint particlePositionSSBOBufferObject;
     glGenBuffers(1, &particlePositionSSBOBufferObject);
     glBindBufferBase(GL_SHADER_STORAGE_BUFFER, particlePositionSSBOLocation, particlePositionSSBOBufferObject);
-    glBufferData(GL_SHADER_STORAGE_BUFFER, numParticles * sizeof(glm::vec4), particles->pos, GL_DYNAMIC_DRAW);
+    glBufferData(GL_SHADER_STORAGE_BUFFER, numParticles * sizeof(glm::vec4), particles->pos__radius, GL_DYNAMIC_DRAW);
     glBindBuffer(GL_SHADER_STORAGE_BUFFER, 0);
 
     cudaGraphicsResource_t vboParticlesPos_cuda;

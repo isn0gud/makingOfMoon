@@ -2,6 +2,7 @@
 
 #include <driver_types.h>
 #include "../../ParticleSim_I.hpp"
+#include "../../Particles.hpp"
 
 class RndTestSimGPU : ParticleSim_I {
 

@@ -1,6 +1,7 @@
 #pragma once
 
 #include "../../ParticleSim_I.hpp"
+#include "../../Particles.hpp"
 #include <driver_types.h>
 
 class GravitySimGPU : ParticleSim_I {

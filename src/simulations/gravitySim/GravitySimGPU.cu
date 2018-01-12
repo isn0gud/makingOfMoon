@@ -1,8 +1,7 @@
-#include "GravitySimGPU.cuh"
+#include "GravitySimGPU.hpp"
 #include <cuda_gl_interop.h>
 #include <cuda_runtime_api.h>
 #include <device_launch_parameters.h>
-//#include "../../cudaUtil.cuh"
 #include "vector_types.h"
 #include "../../util/helper_cuda.h"
 
@@ -17,17 +16,33 @@
 #define G 6.674E-20
 #define distanceEpsilon 47.0975
 
-__global__ void update_step(glm::vec4 *pPos, Particles::Particles_cuda *particles) {
+
+__global__ void update_step(glm::vec4 *p_pos_radius, Particles::Particles_cuda *particles) {
+
+    struct ParticleConst {
+        float elasticSpringConstant;
+        float shellDepthFraction;
+        float inelasticSpringForceReductionFactor;
+    }
+            ironConst = {.elasticSpringConstant = IRON_elasticSpringConstant,
+            .shellDepthFraction = IRON_shellDepthFraction,
+            .inelasticSpringForceReductionFactor = IRON_inelasticSpringForceReductionFactor},
+
+            silicateConst = {.elasticSpringConstant = SILICATE_elasticSpringConstant,
+            .shellDepthFraction = SILICATE_shellDepthFraction,
+            .inelasticSpringForceReductionFactor = SILICATE_inelasticSpringForceReductionFactor};
+
+
     int i = blockIdx.x * blockDim.x + threadIdx.x;
 
-    particles->numParticles = NUM_PARTICLES;
-    if (i < particles->numParticles) {
+//    particles->numParticles = NUM_PARTICLES;
+    if (i < *particles->numParticles) {
         glm::vec3 force(0, 0, 0);
-        for (int j = 0; j < particles->numParticles; j++) {
-            if(i==j)
+        for (int j = 0; j < *particles->numParticles; j++) {
+            if (i == j)
                 continue;
 
-            glm::vec3 difference = glm::vec3(pPos[i]) - glm::vec3(pPos[j]);
+            glm::vec3 difference = glm::vec3(p_pos_radius[i]) - glm::vec3(p_pos_radius[j]);
 
             float distance = glm::length(difference);
             glm::vec3 differenceNormal = (difference / distance);
@@ -40,52 +55,58 @@ __global__ void update_step(glm::vec4 *pPos, Particles::Particles_cuda *particle
 
             // Newtonian gravity (F_g = -G m_1 m_2 r^(-2) hat{n})
             force -= differenceNormal * (float) ((double) G *
-                                                 (((double) particles->mass[i] * (double) particles->mass[j]) /
+                                                 (((double) particles->velo__mass[i].w *
+                                                   (double) particles->velo__mass[j].w) /
                                                   ((double) (distance * distance))));
 
             // Separation "spring"
-            if (distance < particles->radius[i] + particles->radius[j]) {
-                float elasticConstantParticle1 = particles->elasticSpringConstant[i];
-                float elasticConstantParticle2 = particles->elasticSpringConstant[j];
+            if (distance < p_pos_radius[i].w + p_pos_radius[j].w) {
+                ParticleConst pConst1 = (particles->type[i] == TYPE::IRON) ? ironConst : silicateConst;
+                ParticleConst pConst2 = (particles->type[j] == TYPE::IRON) ? ironConst : silicateConst;
+
+                float elasticConstantParticle1 = pConst1.elasticSpringConstant;
+                float elasticConstantParticle2 = pConst2.elasticSpringConstant;
 
                 // If the separation increases, i.e. the separation velocity is positive
-                if (dot(differenceNormal, glm::vec3(particles->velo[i] - particles->velo[j])) > 0) {
+                if (dot(differenceNormal, glm::vec3(particles->velo__mass[i])
+                                          - glm::vec3(particles->velo__mass[j])) > 0) {
                     // Check if the force shall be reduced due to plastic deformation
-                    if (distance < particles->radius[i] * particles->shellDepthFraction[i] +
-                                   particles->radius[j] * particles->shellDepthFraction[j]) {
+                    if (distance < p_pos_radius[i].w * pConst1.shellDepthFraction +
+                                   p_pos_radius[j].w * pConst2.shellDepthFraction) {
                         //case 1d
-                        elasticConstantParticle1 *= particles->inelasticSpringForceReductionFactor[i];
-                        elasticConstantParticle2 *= particles->inelasticSpringForceReductionFactor[j];
+                        elasticConstantParticle1 *= pConst1.inelasticSpringForceReductionFactor;
+                        elasticConstantParticle2 *= pConst2.inelasticSpringForceReductionFactor;
                     } else if (distance <
-                               particles->radius[i] * particles->shellDepthFraction[i] + particles->radius[j]) {
+                               p_pos_radius[i].w * pConst1.shellDepthFraction +
+                               p_pos_radius[j].w) {
                         // case 1c 1
-                        elasticConstantParticle1 *= particles->inelasticSpringForceReductionFactor[i];
+                        elasticConstantParticle1 *= pConst1.inelasticSpringForceReductionFactor;
                     } else if (distance <
-                               particles->radius[i] + particles->radius[j] * particles->shellDepthFraction[j]) {
+                               p_pos_radius[i].w +
+                               p_pos_radius[j].w * pConst2.shellDepthFraction) {
                         //case 1c 2
-                        elasticConstantParticle2 *= particles->inelasticSpringForceReductionFactor[j];
+                        elasticConstantParticle2 *= pConst2.inelasticSpringForceReductionFactor;
                     }
                 }
 
                 float efficientSpringConstant = (elasticConstantParticle1 + elasticConstantParticle2);
                 // Add compression force (F_s = k_eff ((r_1+r_2)^2 - r^2))
                 force += differenceNormal * efficientSpringConstant *
-                         ((particles->radius[i] + particles->radius[j]) *
-                          (particles->radius[i] + particles->radius[j]) -
+                         ((p_pos_radius[i].w + p_pos_radius[j].w) *
+                          (p_pos_radius[i].w + p_pos_radius[j].w) -
                           distance * distance);
             }
         }
 
         // Leapfrog integration (better than Euler for gravity simulations)
-        glm::vec4 newAcceleration = glm::vec4(force / particles->mass[i], 0); // a_i+1 = F_i+1 / m
+        glm::vec3 newAcceleration = force / particles->velo__mass[i].w; // a_i+1 = F_i+1 / m
 
-        pPos[i] += particles->velo[i] * timeStep +
-                   particles->accel[i] * 0.5f * timeStep *
-                   timeStep; // x_i+1 = v_i*dt + a_i*dt^2/2
-        particles->velo[i] +=
-                (particles->accel[i] + newAcceleration) * 0.5f * timeStep; // v_i+1 = v_i + (a_i + a_i+1)dt/2
-        particles->accel[i] = newAcceleration;
-        pPos[i].w = 1;
+        p_pos_radius[i] += glm::vec4(glm::vec3(particles->velo__mass[i]) * timeStep +
+                                     glm::vec3(particles->accel[i]) * 0.5f * timeStep *
+                                     timeStep, 0); // x_i+1 = v_i*dt + a_i*dt^2/2
+        particles->velo__mass[i] +=
+                glm::vec4((glm::vec3(particles->accel[i]) + newAcceleration) * 0.5f * timeStep, 0);
+        particles->accel[i] = glm::vec4(newAcceleration, 1);
     }
 }
 
@@ -100,7 +121,7 @@ void GravitySimGPU::updateStep(int numTimeSteps) {
 
     int numberOfBlocks = (numParticles + BLOCK_SIZE - 1) / BLOCK_SIZE;
     // Update the position of the particles
-    update_step<<<numberOfBlocks, BLOCK_SIZE>>>(d_particles, p_cuda);
+    update_step << < numberOfBlocks, BLOCK_SIZE >> > (d_particles, p_cuda);
     cudaError_t err = cudaGetLastError();
     if (err != cudaSuccess)
         printf("Error: %s\n", cudaGetErrorString(err));
