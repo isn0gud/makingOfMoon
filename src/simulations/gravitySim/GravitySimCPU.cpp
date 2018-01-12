@@ -5,11 +5,6 @@
 #define COLL_SPEED 1.5
 #define CUBE_SIDE 5
 
-//  units: SI, but km instead of m
-//  6.674×10−20 (km)^3⋅kg^(−1)⋅s^(−2)
-const float G = 6.674E-20;
-const float distanceEpsilon = 47.0975;
-
 static struct ParticleConst {
     float elasticSpringConstant;
     float shellDepthFraction;
@@ -100,12 +95,11 @@ void GravitySimCPU::updateStep(int numTimeSteps) {
         for (int i = 0; i < forces.size(); i++) {
             glm::vec3 newAcceleration = forces[i] / particles->velo__mass[i].w; // a_i+1 = F_i+1 / m
             particles->pos__radius[i] += glm::vec4(glm::vec3(particles->velo__mass[i]) * timeStep +
-                                                   glm::vec3(particles->accel[i]) * 0.5f * timeStep *
+                                                           newAcceleration * 0.5f * timeStep *
                                                    timeStep, 0); // x_i+1 = v_i*dt + a_i*dt^2/2
             particles->velo__mass[i] +=
-                    glm::vec4((glm::vec3(particles->accel[i]) + newAcceleration) * 0.5f * timeStep, 0);
+                    glm::vec4(newAcceleration * 0.5f * timeStep, 0);
             // v_i+1 = v_i + (a_i + a_i+1)dt/2
-            particles->accel[i] = glm::vec4(newAcceleration, 1);
         }
     }
 }

@@ -1,6 +1,4 @@
-#pragma once
-
-#include <cuda_runtime_api.h>
+#pragma oncecumulative<cuda_runtime_api.h>
 #include "common.hpp"
 
 #define IRON_shellDepthFraction (1 - 0.002f)
@@ -10,6 +8,13 @@
 #define SILICATE_shellDepthFraction (1 - 0.001f)
 #define SILICATE_elasticSpringConstant 2.9114E14
 #define SILICATE_inelasticSpringForceReductionFactor  0.01
+
+
+//  units: SI, but km instead of m
+//  6.674×10−20 (km)^3⋅kg^(−1)⋅s^(−2)
+#define G 6.674E-20
+#define distanceEpsilon 47.0975
+
 
 enum TYPE {
     IRON,
@@ -70,8 +75,6 @@ public:
         velo__mass = new glm::vec4[numParticles];
         memcpy(velo__mass, initData.velo__mass.data(), numParticles * sizeof(glm::vec4));
 
-        accel = new glm::vec4[numParticles];
-
     }
 
     static glm::vec3 getMaterialColor(TYPE materialType) {
@@ -85,21 +88,19 @@ public:
     typedef struct Particles_cuda {
         TYPE *type;
         glm::vec4 *velo__mass;
-        glm::vec4 *accel;
 
         int *numParticles;
     } Particles_cuda;
 
     Particles_cuda *to_cuda() {
         TYPE *type;
-        glm::vec4 *velo, *accel;
+        glm::vec4 *velo;
         int *_numParticles;
 
         // Allocate device data
         cudaMalloc((void **) &_numParticles, sizeof(*_numParticles));
         cudaMalloc((void **) &type, numParticles * sizeof(*type));
         cudaMalloc((void **) &velo, numParticles * sizeof(*velo));
-        cudaMalloc((void **) &accel, numParticles * sizeof(*accel));
 
         // Allocate helper struct on the device
         Particles_cuda *p_cuda;
@@ -109,13 +110,11 @@ public:
         cudaMemcpy(_numParticles, &numParticles, sizeof(*_numParticles), cudaMemcpyHostToDevice);
         cudaMemcpy(type, this->type, numParticles * sizeof(*type), cudaMemcpyHostToDevice);
         cudaMemcpy(velo, this->velo__mass, numParticles * sizeof(*velo), cudaMemcpyHostToDevice);
-        cudaMemcpy(accel, this->accel, numParticles * sizeof(*accel), cudaMemcpyHostToDevice);
 
         //Binding pointers with p_cuda
         cudaMemcpy(&(p_cuda->numParticles), &_numParticles, sizeof(p_cuda->numParticles), cudaMemcpyHostToDevice);
         cudaMemcpy(&(p_cuda->type), &type, sizeof(p_cuda->type), cudaMemcpyHostToDevice);
         cudaMemcpy(&(p_cuda->velo__mass), &velo, sizeof(p_cuda->velo__mass), cudaMemcpyHostToDevice);
-        cudaMemcpy(&(p_cuda->accel), &accel, sizeof(p_cuda->accel), cudaMemcpyHostToDevice);
 
         return p_cuda;
     }
@@ -125,14 +124,13 @@ public:
     TYPE *type;
     glm::vec4 *pos__radius;
     glm::vec4 *velo__mass;
-    glm::vec4 *accel;
 
-    int sizeInBytes() {
-        return numParticles * sizeof(TYPE) +
-               numParticles * sizeof(glm::vec4) +
-               numParticles * sizeof(glm::vec4) +
-               numParticles * sizeof(glm::vec4);
-    }
+//    int sizeInBytes() {
+//        return numParticles * sizeof(TYPE) +
+//               numParticles * sizeof(glm::vec4) +
+//               numParticles * sizeof(glm::vec4) +
+//               numParticles * sizeof(glm::vec4);
+//    }
 
     void setParticlePos(glm::vec4 *particlesPos) {
         delete[](pos__radius);
@@ -142,7 +140,6 @@ public:
     void clear() {
         delete[] type;
         delete[] velo__mass;
-        delete[] accel;
     }
 
 };

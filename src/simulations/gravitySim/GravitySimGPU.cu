@@ -11,11 +11,6 @@
 
 #define BLOCK_SIZE 256
 
-//  units: SI, but km instead of m
-//  6.674×10−20 (km)^3⋅kg^(−1)⋅s^(−2)
-#define G 6.674E-20
-#define distanceEpsilon 47.0975
-
 
 __global__ void update_step(glm::vec4 *p_pos_radius, Particles::Particles_cuda *particles) {
 
@@ -102,24 +97,23 @@ __global__ void update_step(glm::vec4 *p_pos_radius, Particles::Particles_cuda *
         glm::vec3 newAcceleration = force / particles->velo__mass[i].w; // a_i+1 = F_i+1 / m
 
         p_pos_radius[i] += glm::vec4(glm::vec3(particles->velo__mass[i]) * timeStep +
-                                     glm::vec3(particles->accel[i]) * 0.5f * timeStep *
+                                     newAcceleration * 0.5f * timeStep *
                                      timeStep, 0); // x_i+1 = v_i*dt + a_i*dt^2/2
         particles->velo__mass[i] +=
-                glm::vec4((glm::vec3(particles->accel[i]) + newAcceleration) * 0.5f * timeStep, 0);
-        particles->accel[i] = glm::vec4(newAcceleration, 1);
+                glm::vec4(newAcceleration * 0.5f * timeStep, 0);
     }
 }
 
 void GravitySimGPU::updateStep(int numTimeSteps) {
 
-    size_t size = numParticles * sizeof(glm::vec4);
+    size_t size = *p_cuda->numParticles * sizeof(glm::vec4);
     glm::vec4 *d_particles;
 
     checkCudaErrors(cudaGraphicsMapResources(1, &cudaParticlePositionBuffer));
     checkCudaErrors(cudaGraphicsResourceGetMappedPointer((void **) &d_particles,
                                                          &size, cudaParticlePositionBuffer));
 
-    int numberOfBlocks = (numParticles + BLOCK_SIZE - 1) / BLOCK_SIZE;
+    int numberOfBlocks = (*p_cuda->numParticles + BLOCK_SIZE - 1) / BLOCK_SIZE;
     // Update the position of the particles
     update_step << < numberOfBlocks, BLOCK_SIZE >> > (d_particles, p_cuda);
     cudaError_t err = cudaGetLastError();
@@ -132,6 +126,5 @@ void GravitySimGPU::updateStep(int numTimeSteps) {
 
 GravitySimGPU::GravitySimGPU(Particles *particles, cudaGraphicsResource_t particlePos) :
         cudaParticlePositionBuffer(particlePos) {
-    numParticles = particles->numParticles;
     p_cuda = particles->to_cuda();
 }
