@@ -5,7 +5,7 @@
 #include "vector_types.h"
 #include "../../util/helper_cuda.h"
 
-#define timeStep 2.f
+#define timeStep 10.f
 #define COLL_SPEED 1.5
 #define CUBE_SIDE 5
 

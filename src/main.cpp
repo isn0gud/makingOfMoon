@@ -49,7 +49,7 @@ int main(int argc, char **argv) {
     wm->addMouseButtonEventListener(inputHandler);
 
     renderer->init();
-    int NUM_PARTICLESs = 1000;
+    int NUM_PARTICLESs = 10000;
 
     // Build Scene
     float planet1fracton = 0.5;
@@ -81,8 +81,8 @@ int main(int argc, char **argv) {
 
 
     // Init GPU Simulation and print GPU info
-    BodySystemCUDA sim(particles, renderer->allocateParticlesAndInit_gpu(particles));
-//    GravitySimGPU sim(particles, renderer->allocateParticlesAndInit_gpu(particles));
+//    BodySystemCUDA sim(particles, renderer->allocateParticlesAndInit_gpu(particles));
+    GravitySimGPU sim(particles, renderer->allocateParticlesAndInit_gpu(particles));
 
     /* CPU */
 //    particles->setParticlePos(renderer->allocateParticlesAndInit_cpu(particles));
