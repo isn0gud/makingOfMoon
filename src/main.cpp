@@ -79,11 +79,11 @@ int main(int argc, char **argv) {
 
 
     // Init GPU Simulation and print GPU info
-//    GravitySimGPU sim(particles, renderer->allocateParticlesAndInit_gpu(particles));
+    GravitySimGPU sim(particles, renderer->allocateParticlesAndInit_gpu(particles));
 
     /* CPU */
-    particles->setParticlePos(renderer->allocateParticlesAndInit_cpu(particles));
-    GravitySimCPU sim(particles);
+//    particles->setParticlePos(renderer->allocateParticlesAndInit_cpu(particles));
+//    GravitySimCPU sim(particles);
 
 
     displayOpenGLInfo();

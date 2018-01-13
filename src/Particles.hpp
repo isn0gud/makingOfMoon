@@ -1,4 +1,5 @@
-#pragma oncecumulative<cuda_runtime_api.h>
+#pragma once
+#include <cuda_runtime_api.h>
 #include "common.hpp"
 
 #define IRON_shellDepthFraction (1 - 0.002f)
