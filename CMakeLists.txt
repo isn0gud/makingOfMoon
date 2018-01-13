@@ -66,8 +66,8 @@ set(SOURCE_FILES
         src/simulations/PlanetBuilder.hpp
         src/simulations/PlanetBuilder.cpp
 
-        #        src/simulations/nvidia_gems/bodysystemcuda.cu
-        #        src/simulations/nvidia_gems/bodysystemcuda.h
+        src/simulations/nvidia_gems/bodysystemcuda.cu
+        src/simulations/nvidia_gems/bodysystemcuda.h
 
 
         src/renderer/spritesRenderer/CameraRotateCenter.hpp

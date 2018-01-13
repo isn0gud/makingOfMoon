@@ -16,13 +16,15 @@
 #define G 6.674E-20
 #define distanceEpsilon 47.0975
 
-
-enum TYPE {
-    IRON,
-    SILICATE
-};
-
 class Particles {
+
+public:
+    enum TYPE {
+        IRON,
+        SILICATE
+    };
+
+
 public:
     class ParticlesInit {
     public:

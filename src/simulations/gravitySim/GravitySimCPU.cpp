@@ -49,8 +49,8 @@ void GravitySimCPU::updateStep(int numTimeSteps) {
 
                 // Separation "spring"
                 if (distance < particles->pos__radius[i].w + particles->pos__radius[j].w) {
-                    ParticleConst pConst1 = (particles->type[i] == TYPE::IRON) ? ironConst : silicateConst;
-                    ParticleConst pConst2 = (particles->type[j] == TYPE::IRON) ? ironConst : silicateConst;
+                    ParticleConst pConst1 = (particles->type[i] == Particles::TYPE::IRON) ? ironConst : silicateConst;
+                    ParticleConst pConst2 = (particles->type[j] == Particles::TYPE::IRON) ? ironConst : silicateConst;
 
                     float elasticConstantParticle1 = pConst1.elasticSpringConstant;
                     float elasticConstantParticle2 = pConst2.elasticSpringConstant;

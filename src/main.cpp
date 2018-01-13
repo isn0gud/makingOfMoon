@@ -1,5 +1,6 @@
 #include <iostream>
 #include <thread>
+#include "common.hpp"
 
 #include "WindowInputHandler.hpp"
 #include "Timer.hpp"
@@ -11,6 +12,7 @@
 #include "simulations/PlanetBuilder.hpp"
 #include "simulations/gravitySim/GravitySimCPU.hpp"
 #include "simulations/gravitySim/GravitySimGPU.hpp"
+#include "simulations/nvidia_gems/bodysystemcuda.h"
 
 void displayOpenGLInfo() {
     // Display information about the GPU and OpenGL version
@@ -59,15 +61,15 @@ int main(int argc, char **argv) {
     Particles::ParticlesInit pInit;
 
     Particles::ParticlesInit pInit1 = PlanetBuilder::buildPlanet(
-           num_planet1,
-            TYPE::IRON, 3400.f,
-            TYPE::SILICATE, 6371.f,
+            num_planet1,
+            Particles::TYPE::IRON, 3400.f,
+            Particles::TYPE::SILICATE, 6371.f,
             //glm::vec3(0), glm::vec3(0), glm::vec3(0, 7.2921159e-5, 0),
             glm::vec3(0), glm::vec3(0, 0, 0), glm::vec3(0, 0, 0));
     Particles::ParticlesInit pInit2 = PlanetBuilder::buildPlanet(
             num_planet2,
-            TYPE::IRON, 3400.f,
-            TYPE::SILICATE, 6371.f,
+            Particles::TYPE::IRON, 3400.f,
+            Particles::TYPE::SILICATE, 6371.f,
             //glm::vec3(0), glm::vec3(0), glm::vec3(0, 7.2921159e-5, 0),
             glm::vec3(10000.0f), glm::vec3(0, 0, 0),
             glm::vec3(0, 0, 0));
@@ -79,7 +81,8 @@ int main(int argc, char **argv) {
 
 
     // Init GPU Simulation and print GPU info
-    GravitySimGPU sim(particles, renderer->allocateParticlesAndInit_gpu(particles));
+    BodySystemCUDA sim(particles, renderer->allocateParticlesAndInit_gpu(particles));
+//    GravitySimGPU sim(particles, renderer->allocateParticlesAndInit_gpu(particles));
 
     /* CPU */
 //    particles->setParticlePos(renderer->allocateParticlesAndInit_cpu(particles));

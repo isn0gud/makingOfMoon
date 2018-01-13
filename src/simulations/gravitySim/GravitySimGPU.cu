@@ -11,11 +11,6 @@
 
 #define BLOCK_SIZE 256
 
-////  units: SI, but km instead of m
-////  6.674×10−20 (km)^3⋅kg^(−1)⋅s^(−2)
-//#define G 6.674E-20
-//#define distanceEpsilon 47.0975
-
 
 __global__ void update_step(glm::vec4 *p_pos_radius, Particles::Particles_cuda *particles) {
 
@@ -61,8 +56,8 @@ __global__ void update_step(glm::vec4 *p_pos_radius, Particles::Particles_cuda *
 
             // Separation "spring"
             if (distance < p_pos_radius[i].w + p_pos_radius[j].w) {
-                ParticleConst pConst1 = (particles->type[i] == TYPE::IRON) ? ironConst : silicateConst;
-                ParticleConst pConst2 = (particles->type[j] == TYPE::IRON) ? ironConst : silicateConst;
+                ParticleConst pConst1 = (particles->type[i] == Particles::TYPE::IRON) ? ironConst : silicateConst;
+                ParticleConst pConst2 = (particles->type[j] == Particles::TYPE::IRON) ? ironConst : silicateConst;
 
                 float elasticConstantParticle1 = pConst1.elasticSpringConstant;
                 float elasticConstantParticle2 = pConst2.elasticSpringConstant;
@@ -102,10 +97,10 @@ __global__ void update_step(glm::vec4 *p_pos_radius, Particles::Particles_cuda *
         glm::vec3 newAcceleration = force / particles->velo__mass[i].w; // a_i+1 = F_i+1 / m
 
         p_pos_radius[i] += glm::vec4(glm::vec3(particles->velo__mass[i]) * timeStep +
-                                             newAcceleration * 0.5f * timeStep *
+                                     newAcceleration * 0.5f * timeStep *
                                      timeStep, 0); // x_i+1 = v_i*dt + a_i*dt^2/2
         particles->velo__mass[i] +=
-                glm::vec4((newAcceleration) * 0.5f * timeStep, 0);
+                glm::vec4(newAcceleration * 0.5f * timeStep, 0);
     }
 }
 

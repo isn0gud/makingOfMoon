@@ -4,9 +4,9 @@
 #define estimatedPackingEfficiency 0.74f // packing efficency of a ffc-lattice
 
 Particles::ParticlesInit PlanetBuilder::buildPlanet(int numParticlesInPlanet,
-                               TYPE coreType, float coreRadius,
-                               TYPE outerLayerType, float planetRadius,
-                               glm::vec3 position, glm::vec3 velocity, glm::vec3 angularVelocity) {
+                                                    Particles::TYPE coreType, float coreRadius,
+                                                    Particles::TYPE outerLayerType, float planetRadius,
+                                                    glm::vec3 position, glm::vec3 velocity, glm::vec3 angularVelocity) {
 
     Particles::ParticlesInit particlesInit;
 
